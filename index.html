@@ -1,0 +1,148 @@
+<script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jcanvas/16.7.3/jcanvas.js"></script>
+<script type="text/javascript" src="js/FileSaver.min.js"></script>
+
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.9/fabric.min.js">
+</script>
+<h3>My Canvas</h3>
+
+  <canvas id="myCanvas" width="800" height="600">
+    <p>This is fallback content
+    for users of assistive technologies
+    or of browsers that don't have
+    full support for the Canvas API.</p>
+  </canvas>
+<button id="rectangle">Rectangle</button>
+<select id="selectColor">
+  <option value="red">Red</option>
+  <option value="green">Green</option>
+  <option value="blue">Blue</option>
+  <option value="yellow">Yellow</option>
+</select>
+
+<input type="text" id="label"><label for="label"><button id="addText">Add Text</button></label>
+
+<button id="draw">Draw</button>
+<button id="noDraw">NoDraw</button>
+<!-- <button id="remove">remove</button> -->
+<button id="removeMany">removeMany</button>
+<button id="group">group</button>
+<button id="ungroup">ungroup</button>
+
+<button id="forward">forward</button>
+<button id="save">Save</button>
+
+  <script type="text/javascript">
+  // Store the canvas object into a variable
+var $myCanvas = $('#myCanvas');
+
+$('#draw').on('click', function(){
+  canvas.isDrawingMode=true;
+})
+$('#noDraw').on('click', function(){
+  canvas.isDrawingMode=false;
+})
+$('#remove').on('click', function(){
+        canvas.getActiveObject().remove();
+})
+$('#addText').on('click', function(){
+        var label = $("#label").val();
+        text(label)
+})
+$("#forward").on('click', function(){
+  var activeObject = canvas.getActiveObject(),
+      activeGroup = canvas.getActiveGroup();
+// canvas.sendBackwards(myObject)
+// canvas.sendToBack(myObject)
+// canvas.bringForward(myObject)
+canvas.bringToFront(activeObject)
+})
+$("#save").on('click', function(){
+  var save = document.getElementById("myCanvas"), ctx = canvas.getContext("2d");
+  // rectangle('white', 800,800,0,0);
+  // var activeObject = canvas.getActiveObject(),
+  //     activeGroup = canvas.getActiveGroup();
+  //     canvas.bringToFront(activeObject)
+  canvas.backgroundColor="white";
+  canvas.renderAll();
+  save.toBlob(function(blob) {
+    saveAs(blob, "pretty image.png");
+});
+})
+$('#group').on('click', function(){
+  var activegroup = canvas.getActiveGroup();
+  var objectsInGroup = activegroup.getObjects();
+  activegroup.clone(function(newgroup) {
+      canvas.discardActiveGroup();
+      objectsInGroup.forEach(function(object) {
+          canvas.remove(object);
+      });
+      canvas.add(newgroup);
+  });
+});
+$("#ungroup").click(function(){
+   var activeObject = canvas.getActiveObject();
+    if(activeObject.type=="group"){
+        var items = activeObject._objects;
+        //alert(items);
+        activeObject._restoreObjectsState();
+        canvas.remove(activeObject);
+        for(var i = 0; i < items.length; i++) {
+          canvas.add(items[i]);
+          canvas.item(canvas.size()-1).hasControls = true;
+        }
+
+        canvas.renderAll();
+    }
+});
+
+$('#removeMany').on('click', function(){
+if(canvas.getActiveGroup()){
+      canvas.getActiveGroup().forEachObject(function(o){ canvas.remove(o) });
+      canvas.discardActiveGroup().renderAll();
+    } else {
+      canvas.remove(canvas.getActiveObject());
+    }
+})
+
+$("#rectangle").on('click', function(e) {
+  //e.preventDefault();
+  var color = $("#selectColor").find(':selected').val();
+  rectangle(color, 125,75,100,100);
+})
+// create a wrapper around native canvas element (with id="c")
+var canvas = new fabric.Canvas('myCanvas');
+// create a rectangle object
+function rectangle(color, width, height, left, top){
+  var rect = new fabric.Rect({
+    left: left,
+    top: top,
+    fill: color,
+    width: width,
+    height: height
+  });
+  canvas.add(rect)
+}
+function text(label){
+  var text = new fabric.Text(label, {
+  fontSize: 30,
+  originX: 'center',
+  originY: 'center',
+  left: 100,
+  top: 100,
+});
+canvas.add(text)
+}
+var circle = new fabric.Circle({
+  radius: 20, fill: 'green', left: 100, top: 100
+});
+var triangle = new fabric.Triangle({
+  width: 20, height: 30, fill: 'blue', left: 50, top: 50
+});
+
+// "add" rectangle onto canvas
+//canvas.add(rect, circle, triangle);
+  </script>
