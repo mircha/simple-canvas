@@ -4,40 +4,298 @@
   crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jcanvas/16.7.3/jcanvas.js"></script>
 <script type="text/javascript" src="js/FileSaver.min.js"></script>
+<script src="js/jscolor.min.js"></script>
 
-<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.9/fabric.min.js">
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.9/fabric.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script><!--socketIO-->
+
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
+
+<script type="text/javascript">
+var socketid='';
+var socket = io('http://192.168.116.1:3000');
+var j=1;
+socket.on('connect', function () {
+
+  socket.on('socketid', function (socket) {
+    socketid = socket;
+    //$("#myId").text(socket);
+  });
+  socket.on('clearCanvas',function(){
+    canvas.clear();
+    j=1;
+  });
+socket.on('add path', function(path) {
+  fabric.util.enlivenObjects([path], function(objects) {
+    objects.forEach(function(o) {
+      canvas.add(o);
+    });
+  });
+});
+});
+
+
+ socket.on('do_redraw', function (data) {
+
+  //      console.info("client_js_object_redraw:",data)
+    //    console.info("data.target.type",data.object.type)
+        var ele = canvas.getObjects()
+        for (var i=0;i<ele.length;i++) {
+            var cur_object = ele[i]
+            if (data.id == cur_object.id){           
+
+                canvas.remove(cur_object);
+                draw_object_by_type(data)
+            }
+        }
+});
+socket.on('drawObj', function (id, data) {
+        //console.info("client_js_object_redraw:",data)
+        //console.info("data.target.type",data.object.type)
+        
+        var ids =[];
+        var ele = canvas.getObjects()
+        for (var i=0;i<ele.length;i++) {
+            var cur_object = ele[i]
+             ids.push(cur_object.id);
+             console.log(cur_object.id)        
+        }
+        if(ids.includes(id)==false){
+          console.log(' ID: '+id)
+          data.object = data;
+                draw_object_by_typeOnce(id,data)
+                j++;
+                console.log(' j: '+j)
+        }else{
+          //console.log('already added')
+        }
+        
+});
+ function draw_object_by_typeOnce(id, data){
+    if(data.object.type=="rect"){
+        draw_rectOnce(id ,data);
+       }else if(data.object.type=="text"){
+           draw_textOnce(id ,data);
+       } else if(data.object.type=="triangle"){
+           draw_triangleOnce(id, data);
+       }else if(data.object.type=="circle"){
+           draw_circleOnce(id, data);
+       }
+  
+}
+function draw_rectOnce(id,data){
+    var id =  id;
+    var object = data;
+    var rect = new fabric.Rect({
+        id:id,
+        left : object.left,
+        top :object.top,
+        width : object.width,
+        height : object.height,
+        stroke:object.stroke,
+        scaleX: object.scaleX,
+        scaleY: object.scaleY,
+        angle: object.angle,
+        fill : object.fill
+    });
+
+    canvas.add(rect);
+    return rect;
+}
+function draw_textOnce(id, data){
+  console.log(data)
+  var id =  id;
+  var object = data;
+  var text = new fabric.Text(object.text, {
+  id: id,
+  fontSize: object.fontSize,
+  originX: object.originX,
+  originY: object.originY,
+  fill: object.fill,
+  stroke: object.stroke,
+  left : object.left,
+  scaleX: object.scaleX,
+  scaleY: object.scaleY,
+  angle: object.angle,
+  top :object.top
+});
+  canvas.add(text)
+  return text;
+}
+function draw_triangleOnce(id, data){
+  var id =  id;
+  var object = data;
+  var triangle = new fabric.Triangle({
+        id:id,
+        left : object.left,
+        top :object.top,
+        width : object.width,
+        height : object.height,
+        scaleX: object.scaleX,
+        scaleY: object.scaleY,
+        angle: object.angle,
+        fill : object.fill,
+        stroke:object.stroke
+});
+  canvas.add(triangle)
+  return triangle;
+}
+function draw_circleOnce(id, data){
+    var id =  id;
+    var object = data
+    var circle = new fabric.Circle({
+        id:id,
+        left : object.left,
+        top :object.top,
+        radius : object.radius,
+        scaleX: object.scaleX,
+        scaleY: object.scaleY,
+        angle: object.angle,
+        stroke:object.stroke,
+        fill : object.fill
+    });
+
+    canvas.add(circle);
+    return circle;
+}
+ function draw_object_by_type(data){
+    if(data.object.type=="rect"){
+
+        draw_rect(data);
+       }else if(data.object.type=="text"){
+           draw_text(data);
+       } else if(data.object.type=="triangle"){
+           draw_triangle(data);
+       }else if(data.object.type=="circle"){
+           draw_circle(data);
+       }
+  
+}
+function draw_rect(data){
+    var id =  data.id;
+    var object = data.object
+    var rect = new fabric.Rect({
+        id:id,
+        left : object.left,
+        top :object.top,
+        width : object.width,
+        height : object.height,
+        scaleX: object.scaleX,
+        scaleY: object.scaleY,
+        angle: object.angle,
+        stroke:object.stroke,
+        fill : object.fill
+    });
+
+    canvas.add(rect);
+    return rect;
+}
+function draw_text(data){
+  var id =  data.id;
+  var object = data.object;
+  var text = new fabric.Text(object.text, {
+  id: id,
+  fontSize: object.fontSize,
+  originX: object.originX,
+  originY: object.originY,
+  fill: object.fill,
+  stroke: object.stroke,
+  left : object.left,
+  scaleX: object.scaleX,
+  scaleY: object.scaleY,
+  angle: object.angle,
+  top :object.top
+});
+  canvas.add(text)
+  return text;
+}
+function draw_triangle(data){
+    var id =  data.id;
+    var object = data.object
+    var triangle = new fabric.Triangle({
+        id:id,
+        left : object.left,
+        top :object.top,
+        width : object.width,
+        height : object.height,
+        scaleX: object.scaleX,
+        scaleY: object.scaleY,
+        angle: object.angle,
+        stroke:object.stroke,
+        fill : object.fill
+    });
+
+    canvas.add(triangle);
+    return triangle;
+}
+function draw_circle(data){
+    var id =  data.id;
+    var object = data.object
+    var circle = new fabric.Circle({
+        id:id,
+        left : object.left,
+        top :object.top,
+        radius : object.radius,
+        scaleX: object.scaleX,
+        scaleY: object.scaleY,
+        angle: object.angle,
+        stroke:object.stroke,
+        fill : object.fill
+    });
+
+    canvas.add(circle);
+    return circle;
+}
 </script>
-<h3>My Canvas</h3>
+<h3>Whiteboard</h3>
 
-  <canvas id="myCanvas" width="800" height="600">
+  <canvas id="myCanvas" width="955" height="500" style="border:1px dotted black">
     <p>This is fallback content
     for users of assistive technologies
     or of browsers that don't have
     full support for the Canvas API.</p>
   </canvas>
-<button id="rectangle">Rectangle</button>
-<select id="selectColor">
-  <option value="red">Red</option>
-  <option value="green">Green</option>
-  <option value="blue">Blue</option>
-  <option value="yellow">Yellow</option>
-</select>
+<button class="btn btn-default" id="rectangle"><i class="fa fa-square"></i></button>
+<button class="btn btn-default" id="triangle"><i class="glyphicon glyphicon-triangle-top"></i></button>
+<button class="btn btn-default" id="circle"><i class="fa fa-circle"></i></button>
+<button class="btn btn-default" id="line"><i class="fa fa-arrows-h"></i></button>
+<button class="btn btn-default" id="lineVertical"><i class="fa fa-arrows-v"></i></button>
 
-<input type="text" id="label"><label for="label"><button id="addText">Add Text</button></label>
 
-<button id="draw">Draw</button>
-<button id="noDraw">NoDraw</button>
+<label for="pickColor"><i class="glyphicon glyphicon-text-background" style="font-size:16px;vertical-align:middle"></i></label>
+<button id="pickColor"
+    class="btn btn-default jscolor {valueElement:'selectColor',value:'000000',hash:true}"
+    style="width:50px; height:20px;"></button>
+<label for="pickColor2"><i class="glyphicon glyphicon-text-color"  style="font-size:16px;vertical-align:middle"></i></label>
+<button id="pickColor2"
+    class="btn btn-default jscolor {valueElement:'selectColor2',value:'000000',hash:true}"
+    style="width:50px; height:20px;"></button>
+<input id="selectColor2" value="FFFFFF" style="display:none">
+<input id="selectColor" value="FFFFFF" style="display:none">
+<input type="text" id="label" placeholder="insert text here">
+<button class="btn btn-default" id="addText"><i class="fa fa-text-width"></i></button>
+
+<button class="btn btn-default" id="draw"><i class="glyphicon glyphicon-pencil"></i></button>
+<button class="btn btn-default" id="noDraw"><i class="fa fa-arrows"></i></button>
 <!-- <button id="remove">remove</button> -->
-<button id="removeMany">removeMany</button>
-<button id="group">group</button>
-<button id="ungroup">ungroup</button>
+<button class="btn btn-default" id="removeMany"><i class="fa fa-trash-o"></i></button>
+<button class="btn btn-default" id="group" disabled><i class="fa fa-object-group"></i></button>
+<button class="btn btn-default" id="ungroup" disabled><i class="fa fa-object-ungroup"></i></button>
 
-<button id="forward">forward</button>
-<button id="save">Save</button>
+<button class="btn btn-default" id="forward"><i class="fa fa-level-up"></i></button>
+<button class="btn btn-default" id="back"><i class="fa fa-level-down"></i></button>
+<button class="btn btn-default" id="save"><i class="fa fa-floppy-o"></i></button>
+<button class="btn btn-default" id="clear"><i class="fa fa-clone"></i></button>
 
   <script type="text/javascript">
   // Store the canvas object into a variable
-var $myCanvas = $('#myCanvas');
+
+   var canvas  = document.getElementById('myCanvas');
+   var context = canvas.getContext('2d');
 
 $('#draw').on('click', function(){
   canvas.isDrawingMode=true;
@@ -49,8 +307,15 @@ $('#remove').on('click', function(){
         canvas.getActiveObject().remove();
 })
 $('#addText').on('click', function(){
+        var color = $("#selectColor").val();
         var label = $("#label").val();
-        text(label)
+        var stroke = $("#selectColor2").val();
+        text(label, color, stroke)
+})
+$('#clear').on('click', function(){
+  canvas.clear();
+  socket.emit('clear');
+  j=1;
 })
 $("#forward").on('click', function(){
   var activeObject = canvas.getActiveObject(),
@@ -62,10 +327,6 @@ canvas.bringToFront(activeObject)
 })
 $("#save").on('click', function(){
   var save = document.getElementById("myCanvas"), ctx = canvas.getContext("2d");
-  // rectangle('white', 800,800,0,0);
-  // var activeObject = canvas.getActiveObject(),
-  //     activeGroup = canvas.getActiveGroup();
-  //     canvas.bringToFront(activeObject)
   canvas.backgroundColor="white";
   canvas.renderAll();
   save.toBlob(function(blob) {
@@ -94,7 +355,6 @@ $("#ungroup").click(function(){
           canvas.add(items[i]);
           canvas.item(canvas.size()-1).hasControls = true;
         }
-
         canvas.renderAll();
     }
 });
@@ -110,39 +370,105 @@ if(canvas.getActiveGroup()){
 
 $("#rectangle").on('click', function(e) {
   //e.preventDefault();
-  var color = $("#selectColor").find(':selected').val();
-  rectangle(color, 125,75,100,100);
+  var color = $("#selectColor").val();
+  var stroke = $("#selectColor2").val();
+  rectangle(color,stroke,125,75,100,100);
+  //socket.emit('rect', color, 125,75,100,100)
+})
+$("#line").on('click', function(e) {
+  //e.preventDefault();
+  var color = $("#selectColor").val();
+  rectangle(color,color, 125,3,100,100);
+  //socket.emit('rect', color, 125,75,100,100)
+})
+$("#triangle").on('click', function(e) {
+  //e.preventDefault();
+  var color = $("#selectColor").val();
+  var stroke = $("#selectColor2").val();
+  triangle(color, stroke);
+  //socket.emit('rect', color, 125,75,100,100)
+})
+$("#circle").on('click', function(e) {
+  //e.preventDefault();
+  var stroke = $("#selectColor2").val();
+  var color = $("#selectColor").val();
+  circle(color, stroke);
+  //socket.emit('rect', color, 125,75,100,100)
+})
+$("#lineVertical").on('click', function(e) {
+  //e.preventDefault();
+  var color = $("#selectColor").val();
+  rectangle(color,color, 3,125,100,100);
+  //socket.emit('rect', color, 125,75,100,100)
 })
 // create a wrapper around native canvas element (with id="c")
 var canvas = new fabric.Canvas('myCanvas');
+
+ canvas.on('object:modified', function(options){
+            //console.info("object modified",options)
+           socket.emit('send_redraw', {id:options.target.id,object:options.target});
+
+    },false);
+
+canvas.on('path:created', function(event) {
+    //log the svg path  info
+   //console.log(event.path);
+   //socket.emit('canvas', event.path.path, event.path.left, event.path.top);
+   event.path.id = fabric.Object.__uid++;
+   socket.emit('pathadded', event.path);
+})
+canvas.on('object:modified', function(event) {
+    //var modifiedObject = event.target;
+    //console.log(modifiedObject.get('left'), modifiedObject.get('top'));
+})
+canvas.on('object:added', function(options) {
+          socket.emit('objAddOnce', options.target.id,options.target);
+}, false)
+
 // create a rectangle object
-function rectangle(color, width, height, left, top){
+function rectangle(color,stroke, width, height, left, top){
   var rect = new fabric.Rect({
+    id: j,
     left: left,
     top: top,
     fill: color,
+    stroke: stroke,
     width: width,
     height: height
   });
-  canvas.add(rect)
+  canvas.add(rect);
+  j++;
 }
-function text(label){
+function text(label, color, stroke){
   var text = new fabric.Text(label, {
+  id: j,
   fontSize: 30,
+  fill: color,
+  stroke: stroke,
   originX: 'center',
   originY: 'center',
   left: 100,
   top: 100,
 });
-canvas.add(text)
+  canvas.add(text)
+  j++;
 }
-var circle = new fabric.Circle({
-  radius: 20, fill: 'green', left: 100, top: 100
+function circle(color, stroke){
+  var circle = new fabric.Circle({
+    id:j,
+  radius: 30, fill: color, left: 100, top: 100, stroke:stroke
 });
-var triangle = new fabric.Triangle({
-  width: 20, height: 30, fill: 'blue', left: 50, top: 50
+  canvas.add(circle)
+  j++;
+}
+function triangle(color, stroke){
+  var triangle = new fabric.Triangle({
+  id:j,
+  width: 50, height: 50, fill: color, left: 50, top: 50, stroke:stroke
 });
+  canvas.add(triangle)
+  j++;
+}
 
-// "add" rectangle onto canvas
-//canvas.add(rect, circle, triangle);
+
   </script>
