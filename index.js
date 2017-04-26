@@ -30,7 +30,7 @@ io.sockets.on('connection', function(socket){
 		//io.emit('message', 'blah');
 	})
 	socket.on('send_redraw', function( data){
-		//console.log(data)
+		console.log(data)
 		socket.broadcast.to('chat').emit('do_redraw', data);
 		//io.emit('message', 'blah');
 	})
@@ -42,6 +42,16 @@ io.sockets.on('connection', function(socket){
 	})
 	socket.on('clear', function(){
 		socket.broadcast.to('chat').emit('clearCanvas');
+	})
+	socket.on('removeObject', function(o){
+		console.log('Removed object with id:'+o+'  '+o.id);
+		socket.broadcast.to('chat').emit('removeObj',o);
+	})
+	socket.on('bringToFront', function(o){
+		socket.broadcast.to('chat').emit('bringToFront',o);
+	})
+	socket.on('sendToBack', function(o){
+		socket.broadcast.to('chat').emit('sendToBack',o);
 	})
 });
 

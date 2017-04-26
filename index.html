@@ -2,11 +2,12 @@
   src="https://code.jquery.com/jquery-3.2.1.min.js"
   integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
   crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jcanvas/16.7.3/jcanvas.js"></script>
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jcanvas/16.7.3/jcanvas.js"></script>-->
 <script type="text/javascript" src="js/FileSaver.min.js"></script>
 <script src="js/jscolor.min.js"></script>
 
-<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.9/fabric.min.js"></script>
+<!--<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.9/fabric.min.js"></script>-->
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.11/fabric.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script><!--socketIO-->
 
 
@@ -14,66 +15,77 @@
     
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 <script type="text/javascript">
 var socketid='';
-var socket = io('http://192.168.116.1:3000');
-var j=1;
+var socket = io('http://192.168.0.112:3000');
+var j=0;
 socket.on('connect', function () {
-
   socket.on('socketid', function (socket) {
     socketid = socket;
     //$("#myId").text(socket);
   });
   socket.on('clearCanvas',function(){
     canvas.clear();
-    j=1;
+    j=0;
   });
-socket.on('add path', function(path) {
-  fabric.util.enlivenObjects([path], function(objects) {
-    objects.forEach(function(o) {
-      canvas.add(o);
-    });
-  });
-});
+// socket.on('add path', function(path) {
+//   fabric.util.enlivenObjects([path], function(objects) {
+//     objects.forEach(function(o) {
+//       canvas.add(o);
+//     });
+//   });
+// });
 });
 
-
- socket.on('do_redraw', function (data) {
+socket.on('do_redraw', function (data) {
 
   //      console.info("client_js_object_redraw:",data)
     //    console.info("data.target.type",data.object.type)
         var ele = canvas.getObjects()
+        //console.log(ele[0])
+
         for (var i=0;i<ele.length;i++) {
             var cur_object = ele[i]
-            if (data.id == cur_object.id){           
+              if (data.id == cur_object.id){           
 
-                canvas.remove(cur_object);
-                draw_object_by_type(data)
-            }
+                  canvas.remove(cur_object);
+                  draw_object_by_type(data)
+              }
         }
+        //console.log(data.index)
+        var ele = canvas.getObjects()
+        for (var i=0;i<ele.length;i++) {
+          if(data.object.type!='path'){
+            canvas.moveTo(getObjectFromCanvasById(data.index[i].id),data.index[i].pos )
+          }else{
+           // var a = getObjectFromCanvasById(data.target.id)
+            //console.log(data.id, a)
+          }
+        }
+        //canvas.renderAll();
+
 });
 socket.on('drawObj', function (id, data) {
         //console.info("client_js_object_redraw:",data)
         //console.info("data.target.type",data.object.type)
-        
         var ids =[];
         var ele = canvas.getObjects()
         for (var i=0;i<ele.length;i++) {
             var cur_object = ele[i]
              ids.push(cur_object.id);
-             console.log(cur_object.id)        
+             //console.log(cur_object.id)        
         }
-        if(ids.includes(id)==false){
-          console.log(' ID: '+id)
+        if(ids.includes(id)==false && id!=null){
+          //console.log(' ID: '+id)
           data.object = data;
                 draw_object_by_typeOnce(id,data)
                 j++;
-                console.log(' j: '+j)
+                //console.log(' j: '+j)
         }else{
           //console.log('already added')
-        }
-        
+        } 
 });
  function draw_object_by_typeOnce(id, data){
     if(data.object.type=="rect"){
@@ -84,8 +96,29 @@ socket.on('drawObj', function (id, data) {
            draw_triangleOnce(id, data);
        }else if(data.object.type=="circle"){
            draw_circleOnce(id, data);
+       }else if(data.object.type=='path'){
+        draw_pathOnce(id,data)
+       }else if(data.object.type=='image'){
+        draw_ImageOnce(id, data);
        }
-  
+}
+function draw_ImageOnce(id, data){
+      var id =  id;
+    var object = data;
+  fabric.Image.fromURL(data.src, function(img) {
+    img.set({
+        left : object.left,
+        top :object.top,
+        width : object.width,
+        height : object.height,
+        stroke:object.stroke,
+        scaleX: object.scaleX,
+        scaleY: object.scaleY,
+        angle: object.angle,
+        fill : object.fill
+    });
+    canvas.add(img);
+  });
 }
 function draw_rectOnce(id,data){
     var id =  id;
@@ -102,17 +135,20 @@ function draw_rectOnce(id,data){
         angle: object.angle,
         fill : object.fill
     });
-
     canvas.add(rect);
     return rect;
 }
 function draw_textOnce(id, data){
-  console.log(data)
+  //console.log(data)
   var id =  id;
   var object = data;
   var text = new fabric.Text(object.text, {
   id: id,
   fontSize: object.fontSize,
+  fontFamily: object.fontFamily,
+  fontWeight: object.fontWeight,
+  fontStyle: object.fontStyle,
+  textDecoration: object.textDecoration,
   originX: object.originX,
   originY: object.originY,
   fill: object.fill,
@@ -158,13 +194,34 @@ function draw_circleOnce(id, data){
         stroke:object.stroke,
         fill : object.fill
     });
-
     canvas.add(circle);
     return circle;
 }
- function draw_object_by_type(data){
+function draw_pathOnce(id,data){
+    var id =  id;
+    var object = data
+          var path = new fabric.Path(data.path, {
+              id: id,
+              angle: object.angle,
+              strokeWidth: object.strokeWidth,
+              stroke: object.stroke,
+              fill: object.fill,
+              top: object.top,
+              scaleX: object.scaleX,
+              scaleY: object.scaleY,
+              width : object.width,
+              height : object.height,
+              left: object.left,
+              originX: object.originX,
+              originY: object.originY
+             // originX: 'left',
+             // originY: 'top'
+          });
+          canvas.add(path);
+          return path;
+  }
+function draw_object_by_type(data){
     if(data.object.type=="rect"){
-
         draw_rect(data);
        }else if(data.object.type=="text"){
            draw_text(data);
@@ -172,8 +229,10 @@ function draw_circleOnce(id, data){
            draw_triangle(data);
        }else if(data.object.type=="circle"){
            draw_circle(data);
+       }else if(data.object.type=='path'){
+        //alert('path');
+        draw_path(data)
        }
-  
 }
 function draw_rect(data){
     var id =  data.id;
@@ -190,7 +249,6 @@ function draw_rect(data){
         stroke:object.stroke,
         fill : object.fill
     });
-
     canvas.add(rect);
     return rect;
 }
@@ -200,6 +258,10 @@ function draw_text(data){
   var text = new fabric.Text(object.text, {
   id: id,
   fontSize: object.fontSize,
+  fontFamily: object.fontFamily,
+  fontWeight: object.fontWeight,
+  fontStyle: object.fontStyle,
+  textDecoration: object.textDecoration,
   originX: object.originX,
   originY: object.originY,
   fill: object.fill,
@@ -228,7 +290,6 @@ function draw_triangle(data){
         stroke:object.stroke,
         fill : object.fill
     });
-
     canvas.add(triangle);
     return triangle;
 }
@@ -246,59 +307,278 @@ function draw_circle(data){
         stroke:object.stroke,
         fill : object.fill
     });
-
     canvas.add(circle);
     return circle;
 }
+function draw_path(data){
+    var id =  data.id;
+    var object = data.object
+          var path = new fabric.Path(object.path, {
+              stroke:object.stroke,
+              id: id,
+              angle: object.angle,
+              strokeWidth: object.strokeWidth,
+              stroke: object.stroke,
+              fill: object.fill,
+              top: object.top,
+              scaleX: object.scaleX,
+              scaleY: object.scaleY,
+              width : object.width,
+              height : object.height,
+              left: object.left,
+              originX: object.originX,
+              originY: object.originY
+          });
+          canvas.add(path);
+          return path;
+}
+var myImg = 'http://cdn.flaticon.com/png/256/1480.png';
+function addImg(){
+    fabric.Image.fromURL(myImg, function(oImg) {
+        var l = Math.random() * (500 - 0) + 0;
+        var t = Math.random() * (500 - 0) + 0;                
+            oImg.scale(0.2);
+        oImg.set({'left':l});
+        oImg.set({'top':t});
+        oImg.set('id', j);
+        j++;
+            canvas.add(oImg);
+            console.log(oImg)
+            //canvas.on('object:added',{target:oImg});
+        });
+}
+socket.on('removeObj', function(o){
+  console.log(o+' deleted')
+    const canvasObject = getObjectFromCanvasById(o)
+    canvas.remove(canvasObject)
+});
+socket.on('bringToFront', function(o){
+  const canvasObject = getObjectFromCanvasById(o);
+  //console.log(canvasObject)
+  canvas.bringToFront(canvasObject);
+})
+socket.on('sendToBack', function(o){
+  const canvasObject = getObjectFromCanvasById(o);
+  //console.log(canvasObject)
+  canvas.sendToBack(canvasObject);
+})
+function getObjectFromCanvasById(id) {
+    const canvasObject = window.canvas.getObjects().filter((item) => {
+        return item.id === parseInt(id)
+    })
+    return canvasObject[0]
+}
+function indexes(){
+  var indexes = [];
+  var items = window.canvas.getObjects();
+  items.forEach(function(item){
+    //console.log(item.get('id')+'-->'+window.canvas.getObjects().indexOf(item))
+    indexes.push({
+                  id: item.get('id'),
+                  pos: window.canvas.getObjects().indexOf(item)
+                });
+  })
+  return indexes;
+  //console.log('a'+items)
+}
+
 </script>
-<h3>Whiteboard</h3>
+<h3 class="page-header" style = "margin-top:10px">&nbsp;Whiteboard <small>v1.2_beta</small></h3>
+<div style="float:left;z-index:1000">
+  <!--<button id="test">test</button>-->
 
-  <canvas id="myCanvas" width="955" height="500" style="border:1px dotted black">
-    <p>This is fallback content
-    for users of assistive technologies
-    or of browsers that don't have
-    full support for the Canvas API.</p>
-  </canvas>
-<button class="btn btn-default" id="rectangle"><i class="fa fa-square"></i></button>
-<button class="btn btn-default" id="triangle"><i class="glyphicon glyphicon-triangle-top"></i></button>
-<button class="btn btn-default" id="circle"><i class="fa fa-circle"></i></button>
-<button class="btn btn-default" id="line"><i class="fa fa-arrows-h"></i></button>
-<button class="btn btn-default" id="lineVertical"><i class="fa fa-arrows-v"></i></button>
+    <canvas id="myCanvas" width="955" height="500" style="border:1px dotted black; margin-left:10px">
+      <p>This is fallback content
+      for users of assistive technologies
+      or of browsers that don't have
+      full support for the Canvas API.</p>
+    </canvas>
 
 
-<label for="pickColor"><i class="glyphicon glyphicon-text-background" style="font-size:16px;vertical-align:middle"></i></label>
-<button id="pickColor"
-    class="btn btn-default jscolor {valueElement:'selectColor',value:'000000',hash:true}"
-    style="width:50px; height:20px;"></button>
-<label for="pickColor2"><i class="glyphicon glyphicon-text-color"  style="font-size:16px;vertical-align:middle"></i></label>
-<button id="pickColor2"
-    class="btn btn-default jscolor {valueElement:'selectColor2',value:'000000',hash:true}"
-    style="width:50px; height:20px;"></button>
-<input id="selectColor2" value="FFFFFF" style="display:none">
-<input id="selectColor" value="FFFFFF" style="display:none">
-<input type="text" id="label" placeholder="insert text here">
-<button class="btn btn-default" id="addText"><i class="fa fa-text-width"></i></button>
+  <div class="col-md-3" style="float:left;">
+    <h5>Basic shapes</h5>
+      <button class="btn btn-default" id="rectangle"><i class="fa fa-square"></i></button>
+      <button class="btn btn-default" id="triangle"><i class="glyphicon glyphicon-triangle-top"></i></button>
+      <button class="btn btn-default" id="circle"><i class="fa fa-circle"></i></button>
+      <button class="btn btn-default" id="line"><i class="fa fa-arrows-h"></i></button>
+      <button class="btn btn-default" id="lineVertical"><i class="fa fa-arrows-v"></i></button>
+      <button class="btn btn-default" id="addServer"><i class="fa fa-laptop"></i></button>
+  </div>
+  <div class="col-md-3" style="float:left, text-align: center;">
+    <h5>Color Picker</h5>
+      <label for="pickColor"><i class="glyphicon glyphicon-text-background" style="font-size:16px;vertical-align:middle"></i></label>
+      <button id="pickColor"
+          class="btn btn-default jscolor {valueElement:'selectColor',value:'333333',hash:true}"
+          style="width:35px; height:20px;"></button>
+      <label for="pickColor2"><i class="glyphicon glyphicon-text-color"  style="font-size:16px;vertical-align:middle"></i></label>
+      <button id="pickColor2"
+          class="btn btn-default jscolor {valueElement:'selectColor2',value:'000000',hash:true}"
+          style="width:35px; height:20px;"></button>
+      <input id="selectColor2" value="FFFFFF" style="display:none">
+      <input id="selectColor" value="FFFFFF" style="display:none">
+      <button class="btn btn-default" id="fill"><i class="fa fa-tint"></i></button>
+      <button class="btn btn-default" id="outline"><i class="fa fa-square-o"></i></button>
+  </div>
+<style type="text/css">
+  .btn-group.btn {   border: 0;   padding: 0; }
+</style>
+  <div class="col-md-6.5" style="display:inline">
+    <h5>Text</h5>
+      <input type="text" class="form-control" id="label" placeholder="Insert text here" style="width:175px; float:left">
+      <button class="btn btn-default" id="addText"><i class="fa fa-text-width"></i></button>
+      <button class="btn btn-default" id="textBold"><i class="fa fa-bold"></i></button>
+      <button class="btn btn-default" id="textItalic"><i class="fa fa-italic"></i></button>
+      <button class="btn btn-default" id="textUnderline"><i class="fa fa-underline"></i></button>
+      <button class="btn btn-default" id="textStrike"><i class="fa fa-strikethrough"></i></button>
+      <!-- <div> -->
+        <input type="hidden" value="times" id="textFont"/>
+        <input type="hidden" value="20" id="textSize"/>
+        <div class="btn-group">
+          <button class="btn btn-default btn-group btn-sm dropup">
+            <a class="btn btn-default dropdown-toggle btn-sm" data-toggle="dropdown" href="#"><i class="glyphicon glyphicon-font"></i> <span class="caret"></span></a>
+            <ul class="dropdown-menu" id="fontSelect">
+              <li class="font" id="arial"><a href="#">Arial</a></li>
+              <li class="font" id="comic"><a href="#">Comic Sans</a></li>
+              <li class="font" id="courier"><a href="#">Courier New</a></li>
+              <li class="font" id="times"><a href="#">Times New Roman</a></li>
+              <li class="font" id="verdana"><a href="#">Verdana</a></li>
+            </ul>
+          </button>
+          <button class="btn btn-default btn-group btn-sm dropup">
+            <a class="btn btn-default dropdown-toggle btn-sm" data-toggle="dropdown" href="#"><i class="glyphicon glyphicon-text-size"></i> <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li class="size" id="20"><a href="#">20 px</a></li>
+              <li class="size" id="28"><a href="#">28 px</a></li>
+              <li class="size" id="36"><a href="#">36 px</a></li>
+              <li class="size" id="44"><a href="#">44 px</a></li>
+            </ul>
+          </button>
+        <!-- </div> -->
+        </div>
+  </div>
+  <div class="clearfix"></div>
+</div>
+<div class="col-md-3" style="text-align:left!important" style="width:24%">
+  <div style="overflow:none; z-index:-10">
+    <h5>Mode</h5>
+      <button class="btn btn-default" id="noDraw"><i class="fa fa-arrows"></i></button>
+      <button class="btn btn-default" id="draw"><i class="glyphicon glyphicon-pencil"></i></button>
+      <button class="btn btn-default" id="paint"><i class="fa fa-paint-brush"></i></button>
+      
+  </div>
+  <!-- <button id="remove">remove</button> -->
+  <div>
+    <h5>Edit</h5>
+      <button class="btn btn-default" id="removeMany"><i class="fa fa-trash-o"></i></button>
+      <button class="btn btn-default" id="group" disabled><i class="fa fa-object-group"></i></button>
+      <button class="btn btn-default" id="ungroup" disabled><i class="fa fa-object-ungroup"></i></button>
+      <button class="btn btn-default" id="forward"><i class="fa fa-level-up"></i></button>
+      <button class="btn btn-default" id="back"><i class="fa fa-level-down"></i></button>
 
-<button class="btn btn-default" id="draw"><i class="glyphicon glyphicon-pencil"></i></button>
-<button class="btn btn-default" id="noDraw"><i class="fa fa-arrows"></i></button>
-<!-- <button id="remove">remove</button> -->
-<button class="btn btn-default" id="removeMany"><i class="fa fa-trash-o"></i></button>
-<button class="btn btn-default" id="group" disabled><i class="fa fa-object-group"></i></button>
-<button class="btn btn-default" id="ungroup" disabled><i class="fa fa-object-ungroup"></i></button>
+  </div>
+  <div>
+    <h5>File</h5>
+      <button class="btn btn-default" id="save"><i class="fa fa-floppy-o"></i></button>
+      <button class="btn btn-default" id="clear"><i class="fa fa-clone"></i></button>
+      <button class="btn btn-default" id="svg"><i class="fa fa-code"></i></button>
+      <button class="btn btn-default" id="help"><i class="fa fa-question"></i></button>
+  </div>
+</div>
 
-<button class="btn btn-default" id="forward"><i class="fa fa-level-up"></i></button>
-<button class="btn btn-default" id="back"><i class="fa fa-level-down"></i></button>
-<button class="btn btn-default" id="save"><i class="fa fa-floppy-o"></i></button>
-<button class="btn btn-default" id="clear"><i class="fa fa-clone"></i></button>
+  <div class="panel-group" id="accordion" style="position: fixed; bottom:0;left:0; width:100%;padding:0; margin:0">
+    <div class="panel panel-default">
+      <div id="collapse1" class="panel-collapse collapse out">
+        <div class="panel-body" style="max-height: 450px; overflow-y:scroll">
+          <p>
+            <u>Apr 26, 2017 - v1.2_beta</u>
+            <ul>
+              <li> Layout change - grouped buttons and split the GUI in bottom and right sections</li>
+              <li> Added text options: bold, italic, underline, striketrough, font size and font family</li>
+              <li> Created the Version changes footer</li>
+              <li> Added painbrush option</li>
+              <li> Added fill inside path (also works as change color for shapes)</li>
+              <li> Added change outline color (also works as change line color)</li>
+              <li> Add image on canvas (not working properly)</li>
+            </ul>
+          </p>
+          <p>
+            <u>Apr 25, 2017 - v1.1_beta</u>
+            <ul>
+              <li> Fixed issues with whiteboard not keeping object stack</li>
+              <li> Free draw can be moved now and deleted</li>
+              <li> Added send to back, and integrated bring to front and send to back with socket.io</li>
+            </ul>
+          </p>
+          <p>
+            <u>Apr 14, 2017 - v1</u>
+            <ul>
+              <li> Integration with socket.io - interactivity and bootstrap integration - GUI</li>
+              <li> Added clear canvas, basic shapes - lines, color picker for background and outline</li>
+              <li> Disabled group and ungroup</li>
+            </ul>
+          </p>
+          <p>
+            <u>Apr 13, 2017 - v0</u>
+            <ul>
+              <li> Initial commit, made the whiteboard and added functionality for basic shapes (rectangle, triangle, circle), also added text and free draw, save file, grouping and bring to front
+              </li>
+            </ul>
+          </p>
 
+        </div>
+      </div>
+      <div class="panel-footer" style="height:15px; padding:0; margin:0">
+        <h4 class="panel-title">
+          <a data-toggle="collapse" data-parent="#accordion" href="#collapse1" style="text-decoration:none"><small>&nbsp;&nbsp;<i class="fa fa-history"></i> Version Changes</small></a>
+        </h4>
+      </div>
+    </div>
   <script type="text/javascript">
   // Store the canvas object into a variable
 
    var canvas  = document.getElementById('myCanvas');
    var context = canvas.getContext('2d');
+var strokeWidth = 1;
+
+$(".font").on('click', function(){
+  var id = $(this).attr('id');
+  $('#textFont').val(id);
+})
+$(".size").on('click', function(){
+  var id = $(this).attr('id');
+  $('#textSize').val(id);
+})
+$("#textBold, #textItalic, #textUnderline, #textStrike").on('click', function(){
+  $(this).toggleClass('active');
+})
 
 $('#draw').on('click', function(){
   canvas.isDrawingMode=true;
+  canvas.freeDrawingBrush.color = $("#selectColor").val();
+  strokeWidth = 1;
+  canvas.freeDrawingBrush.width = strokeWidth;
+})
+$('#paint').on('click', function(){
+  canvas.isDrawingMode=true;
+  canvas.freeDrawingBrush.color = $("#selectColor").val();
+  strokeWidth = 15;
+  canvas.freeDrawingBrush.width = strokeWidth;
+  canvas.freeDrawingBrush.strokeLineJoin = 'bevil';
+  canvas.freeDrawingBrush.strokeLineCap = 'round';
+})
+$('#fill').on('click', function(){
+  var o = canvas.getActiveObject();
+  var fill = $("#selectColor").val();
+  o.setFill (fill);
+  canvas.renderAll();
+  canvas.trigger('object:modified', {target: o});
+})
+$('#outline').on('click', function(){
+  var o = canvas.getActiveObject();
+  var stroke = $("#selectColor2").val();
+  o.setStroke (stroke);
+  canvas.renderAll();
+  canvas.trigger('object:modified', {target: o});
 })
 $('#noDraw').on('click', function(){
   canvas.isDrawingMode=false;
@@ -311,11 +591,12 @@ $('#addText').on('click', function(){
         var label = $("#label").val();
         var stroke = $("#selectColor2").val();
         text(label, color, stroke)
+        $("#label").val('');
 })
 $('#clear').on('click', function(){
   canvas.clear();
   socket.emit('clear');
-  j=1;
+  j=0;
 })
 $("#forward").on('click', function(){
   var activeObject = canvas.getActiveObject(),
@@ -324,13 +605,23 @@ $("#forward").on('click', function(){
 // canvas.sendToBack(myObject)
 // canvas.bringForward(myObject)
 canvas.bringToFront(activeObject)
+socket.emit('bringToFront',canvas.getActiveObject().id)
+})
+$("#back").on('click', function(){
+  var activeObject = canvas.getActiveObject(),
+      activeGroup = canvas.getActiveGroup();
+// canvas.sendBackwards(myObject)
+canvas.sendToBack(activeObject)
+socket.emit('sendToBack',canvas.getActiveObject().id)
+// canvas.bringForward(myObject)
+//canvas.bringToFront(activeObject)
 })
 $("#save").on('click', function(){
   var save = document.getElementById("myCanvas"), ctx = canvas.getContext("2d");
   canvas.backgroundColor="white";
   canvas.renderAll();
   save.toBlob(function(blob) {
-    saveAs(blob, "pretty image.png");
+    saveAs(blob, "whiteboard.png");
 });
 })
 $('#group').on('click', function(){
@@ -361,10 +652,13 @@ $("#ungroup").click(function(){
 
 $('#removeMany').on('click', function(){
 if(canvas.getActiveGroup()){
-      canvas.getActiveGroup().forEachObject(function(o){ canvas.remove(o) });
+      canvas.getActiveGroup().forEachObject(function(o){ canvas.remove(o);socket.emit('removeObject', o.id) });
+
       canvas.discardActiveGroup().renderAll();
     } else {
+      var o=canvas.getActiveObject();
       canvas.remove(canvas.getActiveObject());
+      socket.emit('removeObject', o.id)
     }
 })
 
@@ -401,21 +695,37 @@ $("#lineVertical").on('click', function(e) {
   rectangle(color,color, 3,125,100,100);
   //socket.emit('rect', color, 125,75,100,100)
 })
+$("#addServer").on('click', function(e) {
+  //e.preventDefault();
+  addImg();
+  //socket.emit('rect', color, 125,75,100,100)
+})
+
 // create a wrapper around native canvas element (with id="c")
-var canvas = new fabric.Canvas('myCanvas');
+var canvas = new fabric.Canvas('myCanvas', {preserveObjectStacking: false});
 
  canvas.on('object:modified', function(options){
-            //console.info("object modified",options)
-           socket.emit('send_redraw', {id:options.target.id,object:options.target});
+            console.info("object modified",options)
+            //canvas.deactivateAllWithDispatch()//deselect all objects
+            
+            var index = indexes();
+            //console.log(objects)
+           // if(options.target.type!='path'){
+              socket.emit('send_redraw', {id:options.target.id,object:options.target, index:index});
+            //}
 
     },false);
 
 canvas.on('path:created', function(event) {
     //log the svg path  info
-   //console.log(event.path);
+   console.log(event.path);
    //socket.emit('canvas', event.path.path, event.path.left, event.path.top);
-   event.path.id = fabric.Object.__uid++;
-   socket.emit('pathadded', event.path);
+   //event.path.id = fabric.Object.__uid++;
+   //event.path.setStroke('red')
+   event.path.id = j;
+   j++;
+   //socket.emit('pathadded', event.path);
+   socket.emit('objAddOnce', event.path.id,event.path);
 })
 canvas.on('object:modified', function(event) {
     //var modifiedObject = event.target;
@@ -440,9 +750,63 @@ function rectangle(color,stroke, width, height, left, top){
   j++;
 }
 function text(label, color, stroke){
+  var font = $("#textFont").val();
+  var size = $("#textSize").val();
+
+  if($("#textBold").hasClass('active')){
+    fontWeight = 'bold';
+  }else{
+    fontWeight ='normal';
+  }
+  if($("#textItalic").hasClass('active')){
+    fontStyle = 'italic';
+  }else{
+    fontStyle ='normal';
+  }
+    if($("#textUnderline").hasClass('active')){
+    textDecoration1 = 'underline';
+  }else{
+    textDecoration1 ='';
+  }
+    if($("#textStrike").hasClass('active')){
+    textDecoration2 = 'line-through';
+  }else{
+    textDecoration2 ='';
+  }
+
+if(textDecoration1!='' && textDecoration2 !=''){
+  textDecoration = textDecoration1+','+textDecoration2;
+}else{
+  if(textDecoration1==''){
+    textDecoration = textDecoration2;
+  }else{
+    textDecoration = textDecoration1;
+  }
+}
+
+  if(font=='times'){
+    fontFamily = 'Times New Roman, Times, serif';
+  }
+  if(font=='arial'){
+    fontFamily = 'Arial, Helvetica, sans-serif';
+  }
+  if(font=='verdana'){
+    fontFamily = 'Verdana,Geneva,sans-serif';
+  }
+  if(font=='comic'){
+    fontFamily = '"Comic Sans MS", cursive, sans-serif';
+  }
+  if(font=='courier'){
+    fontFamily = '"Courier New", Courier, monospace';
+  }
+
   var text = new fabric.Text(label, {
   id: j,
-  fontSize: 30,
+  fontFamily: fontFamily,
+  fontWeight: fontWeight,
+  fontStyle: fontStyle,
+  textDecoration: textDecoration,
+  fontSize: size,
   fill: color,
   stroke: stroke,
   originX: 'center',
