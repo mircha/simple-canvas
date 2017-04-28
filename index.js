@@ -63,7 +63,7 @@ app.get('/', function(req, res) {
     res.sendFile(path.join(__dirname + '/index.html'));
 });
 app.use('/js', express.static(path.join(__dirname, 'js')))
-
+app.use('/img', express.static(path.join(__dirname, 'img')))
 
 http.listen(3000, function(){
 	console.log('listening on port 3000!')

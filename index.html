@@ -21,6 +21,14 @@
 var socketid='';
 var socket = io('http://192.168.0.112:3000');
 var j=0;
+
+
+var serverImg = 'img/server.png';
+var serversImg = 'img/servers.png';
+var pcImg = 'img/pc.ico';
+var libImg = 'img/library.svg';
+var dbImg = 'img/database.png';
+
 socket.on('connect', function () {
   socket.on('socketid', function (socket) {
     socketid = socket;
@@ -105,8 +113,10 @@ socket.on('drawObj', function (id, data) {
 function draw_ImageOnce(id, data){
       var id =  id;
     var object = data;
+    console.log(data.src)
   fabric.Image.fromURL(data.src, function(img) {
     img.set({
+        id: id,
         left : object.left,
         top :object.top,
         width : object.width,
@@ -230,8 +240,9 @@ function draw_object_by_type(data){
        }else if(data.object.type=="circle"){
            draw_circle(data);
        }else if(data.object.type=='path'){
-        //alert('path');
         draw_path(data)
+       }else if(data.object.type=='image'){
+        draw_Image(data)
        }
 }
 function draw_rect(data){
@@ -332,14 +343,42 @@ function draw_path(data){
           canvas.add(path);
           return path;
 }
-var myImg = 'http://cdn.flaticon.com/png/256/1480.png';
-function addImg(){
-    fabric.Image.fromURL(myImg, function(oImg) {
-        var l = Math.random() * (500 - 0) + 0;
-        var t = Math.random() * (500 - 0) + 0;                
-            oImg.scale(0.2);
-        oImg.set({'left':l});
-        oImg.set({'top':t});
+function draw_Image(data){
+    var id =  data.id;
+    var object = data.object
+  fabric.Image.fromURL(object.src, function(img) {
+    img.set({
+        id: id,
+        left : object.left,
+        top :object.top,
+        width : object.width,
+        height : object.height,
+        stroke:object.stroke,
+        scaleX: object.scaleX,
+        scaleY: object.scaleY,
+        angle: object.angle,
+        fill : object.fill
+    });
+    canvas.add(img);
+  });
+}
+//var myImg = 'http://cdn.flaticon.com/png/256/1480.png';//server
+//var myImg = 'https://image.freepik.com/free-icon/server-rack_318-48050.jpg';//server
+//var myImg = 'http://freeiconbox.com/icon/256/31578.png';//server
+//var myImg = 'https://https://d30y9cdsu7xlg0.cloudfront.net/png/29558-200.png';//servers
+//var myImg = 'https://www.shareicon.net/download/2016/11/14/852368_server.svg'//servers
+//var myImg = 'https://services.vi-seem.eu/static/img/logos/hosting.png';//servers
+//var myImg = 'https://cdn2.iconfinder.com/data/icons/web-and-mobile-ui-volume-7/48/309-512.png';//database
+//var myImg = 'http://www.dcomp.ufsj.edu.br/~ronanlopes/img/icon.png';//pc
+//var myImg = 'http://www.iconarchive.com/download/i95800/iconsmind/outline/Computer-2.ico';//pc
+//var myImg = 'https://image.flaticon.com/icons/svg/31/31100.svg';//library
+//var myImg = './server.svg';//servers
+
+function addImg(myImg){
+    fabric.Image.fromURL(myImg, function(oImg) {             
+        oImg.scale(0.3);
+        oImg.set({'left':100});
+        oImg.set({'top':100});
         oImg.set('id', j);
         j++;
             canvas.add(oImg);
@@ -383,7 +422,7 @@ function indexes(){
 }
 
 </script>
-<h3 class="page-header" style = "margin-top:10px">&nbsp;Whiteboard <small>v1.2_beta</small></h3>
+<h3 class="page-header" style = "margin-top:10px">&nbsp;Whiteboard <small>v1.3_beta</small></h3>
 <div style="float:left;z-index:1000">
   <!--<button id="test">test</button>-->
 
@@ -396,13 +435,39 @@ function indexes(){
 
 
   <div class="col-md-3" style="float:left;">
-    <h5>Basic shapes</h5>
-      <button class="btn btn-default" id="rectangle"><i class="fa fa-square"></i></button>
-      <button class="btn btn-default" id="triangle"><i class="glyphicon glyphicon-triangle-top"></i></button>
-      <button class="btn btn-default" id="circle"><i class="fa fa-circle"></i></button>
-      <button class="btn btn-default" id="line"><i class="fa fa-arrows-h"></i></button>
-      <button class="btn btn-default" id="lineVertical"><i class="fa fa-arrows-v"></i></button>
-      <button class="btn btn-default" id="addServer"><i class="fa fa-laptop"></i></button>
+    <h5>Shapes</h5>
+
+    <div class = "btn-group dropup">
+         <button type = "button" class = "btn btn-default dropdown-toggle " data-toggle = "dropdown">
+            <i class="fa fa-star-o"></i> 
+            <span class = "caret"></span>
+         </button>
+       
+       <ul class = "dropdown-menu" role = "menu">
+          <button class="btn btn-default" id="rectangle"><i class="fa fa-square"></i></button>
+          <button class="btn btn-default" id="triangle"><i class="glyphicon glyphicon-triangle-top"></i></button>
+          <button class="btn btn-default" id="circle"><i class="fa fa-circle"></i></button>
+          <button class="btn btn-default" id="line"><i class="fa fa-arrows-h"></i></button>
+          <button class="btn btn-default" id="lineVertical"><i class="fa fa-arrows-v"></i></button>
+       </ul>
+    </div>
+    <div class = "btn-group dropup">
+         <button type = "button" class = "btn btn-default dropdown-toggle " data-toggle = "dropdown">
+            <i class="fa fa-building-o"></i> 
+            <span class = "caret"></span>
+         </button>
+       
+       <ul class = "dropdown-menu" role = "menu">
+          <button class="btn btn-default" id="addServer"><i class="glyphicon glyphicon-hdd"></i></button>
+          <button class="btn btn-default" id="addServers"><i class="fa fa-server"></i></button>
+          <button class="btn btn-default" id="addPC"><i class="fa fa-laptop"></i></button>
+          <button class="btn btn-default" id="addLib"><i class="fa fa-film"></i></button>
+          <button class="btn btn-default" id="addDb"><i class="fa fa-database"></i></button>
+       </ul>
+    </div>
+
+
+
   </div>
   <div class="col-md-3" style="float:left, text-align: center;">
     <h5>Color Picker</h5>
@@ -489,6 +554,14 @@ function indexes(){
     <div class="panel panel-default">
       <div id="collapse1" class="panel-collapse collapse out">
         <div class="panel-body" style="max-height: 450px; overflow-y:scroll">
+          <p>
+            <u>Apr 28, 2017 - v1.3_beta</u>
+            <ul>
+              <li> Layout change - grouped basic shapes and renamed Basic Shapes into Shapes</li>
+              <li> Layout change - added server, servers, library, database and pc buttons and grouped them in Advanced Shapes under Shapes</li>
+              <li> Fixed Add image on canvas</li>
+            </ul>
+          </p>
           <p>
             <u>Apr 26, 2017 - v1.2_beta</u>
             <ul>
@@ -696,11 +769,20 @@ $("#lineVertical").on('click', function(e) {
   //socket.emit('rect', color, 125,75,100,100)
 })
 $("#addServer").on('click', function(e) {
-  //e.preventDefault();
-  addImg();
-  //socket.emit('rect', color, 125,75,100,100)
+  addImg(serverImg);
 })
-
+$("#addServers").on('click', function(e) {
+  addImg(serversImg);
+})
+$("#addLib").on('click', function(e) {
+  addImg(libImg);
+})
+$("#addPC").on('click', function(e) {
+  addImg(pcImg);
+})
+$("#addDb").on('click', function(e) {
+  addImg(dbImg);
+})
 // create a wrapper around native canvas element (with id="c")
 var canvas = new fabric.Canvas('myCanvas', {preserveObjectStacking: false});
 
