@@ -11,7 +11,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script><!--socketIO-->
 
 
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 
@@ -22,9 +22,7 @@ var socketid='';
 // var socket = io('http://192.168.0.112:3000');
 var socket = io('http://127.0.0.1:3000');
 var j=0;
-var k=0;
-var modified = true;
-var modifiedBroadcast = false;
+
 
 var serverImg = 'img/srv.svg';
 var serversImg = 'img/servers.svg';
@@ -38,7 +36,6 @@ var arrows = 'img/arrows.svg';
 var ftp = 'img/antenna.svg';
 var unc = "img/network.svg";
 var cache = 'img/database-alt1.svg';
-
 socket.on('connect', function () {
   socket.on('socketid', function (socket) {
     socketid = socket;
@@ -49,12 +46,332 @@ socket.on('connect', function () {
     j=0;
   });
 });
-socket.on('updateCanvas', function(json, k){
+socket.on('updateCanvas', function(json){
   canvas.loadFromJSON(json, canvas.renderAll.bind(canvas), function(o, object) {
        fabric.log(o, object);
-       k=j;
-  })
 })
+})
+socket.on('do_redraw', function (data) {
+
+  //      console.info("client_js_object_redraw:",data)
+    //    console.info("data.target.type",data.object.type)
+        var ele = canvas.getObjects()
+        var myIds = [];
+        //console.log(ele[0])
+
+        for (var i=0;i<ele.length;i++) {
+            var cur_object = ele[i];
+            //myIds.push(cur_object.id);
+              if (data.id == cur_object.id){
+
+                  canvas.remove(cur_object);
+                  draw_object_by_type(data)
+              }
+        }
+        //console.log(data.index)
+        var ele = canvas.getObjects()
+        for (var i=0;i<ele.length;i++) {
+          if(data.object.type!='path' && data.object.type!='image'){
+            canvas.moveTo(getObjectFromCanvasById(data.index[i].id),data.index[i].pos )
+            //console.log(data.index[i].id, data.index[i].pos)
+          }else{
+            //var a = getObjectFromCanvasById(data.target.id)
+            //console.log(data.id, a)
+          }
+        }
+
+        //canvas.renderAll();
+
+});
+
+socket.on('drawObj', function (id, data) {
+        //console.info("client_js_object_redraw:",data)
+        //console.info("data.target.type",data.object.type)
+        var ids =[];
+        var ele = canvas.getObjects()
+        for (var i=0;i<ele.length;i++) {
+            var cur_object = ele[i]
+             ids.push(cur_object.id);
+             //console.log(cur_object.id)
+        }
+        if(ids.includes(id)==false && id!=null){
+          //console.log(' ID: '+id)
+          data.object = data;
+                draw_object_by_typeOnce(id,data)
+                j++;
+                //console.log(' j: '+j)
+        }else{
+          //console.log('already added')
+        }
+});
+ function draw_object_by_typeOnce(id, data){
+    if(data.object.type=="rect"){
+        draw_rectOnce(id ,data);
+       }else if(data.object.type=="text"){
+           draw_textOnce(id ,data);
+       } else if(data.object.type=="triangle"){
+           draw_triangleOnce(id, data);
+       }else if(data.object.type=="circle"){
+           draw_circleOnce(id, data);
+       }else if(data.object.type=='path'){
+        draw_pathOnce(id,data)
+       }else if(data.object.type=='image'){
+        draw_ImageOnce(id, data);
+       }
+}
+function draw_ImageOnce(id, data){
+    var id =  id;
+    var object = data;
+    //console.log(data.src)
+  fabric.Image.fromURL(data.src, function(img) {
+    img.set({
+        id: id,
+        left : object.left,
+        top :object.top,
+        width : object.width,
+        height : object.height,
+        stroke:object.stroke,
+        scaleX: object.scaleX,
+        scaleY: object.scaleY,
+        angle: object.angle,
+        fill : object.fill
+    });
+    canvas.add(img);
+  });
+}
+function draw_rectOnce(id,data){
+    var id =  id;
+    var object = data;
+    var rect = new fabric.Rect({
+        id:id,
+        left : object.left,
+        top :object.top,
+        width : object.width,
+        height : object.height,
+        stroke:object.stroke,
+        scaleX: object.scaleX,
+        scaleY: object.scaleY,
+        angle: object.angle,
+        fill : object.fill
+    });
+    canvas.add(rect);
+    return rect;
+}
+function draw_textOnce(id, data){
+  //console.log(data)
+  var id =  id;
+  var object = data;
+  var text = new fabric.Text(object.text, {
+  id: id,
+  fontSize: object.fontSize,
+  fontFamily: object.fontFamily,
+  fontWeight: object.fontWeight,
+  fontStyle: object.fontStyle,
+  textDecoration: object.textDecoration,
+  originX: object.originX,
+  originY: object.originY,
+  fill: object.fill,
+  stroke: object.stroke,
+  left : object.left,
+  scaleX: object.scaleX,
+  scaleY: object.scaleY,
+  angle: object.angle,
+  top :object.top
+});
+  canvas.add(text)
+  return text;
+}
+function draw_triangleOnce(id, data){
+  alert(data.id)
+  var id =  id;
+  var object = data;
+  var triangle = new fabric.Triangle({
+        id:id,
+        left : object.left,
+        top :object.top,
+        width : object.width,
+        height : object.height,
+        scaleX: object.scaleX,
+        scaleY: object.scaleY,
+        angle: object.angle,
+        fill : object.fill,
+        stroke:object.stroke
+});
+  canvas.add(triangle)
+  return triangle;
+}
+function draw_circleOnce(id, data){
+    var id =  id;
+    var object = data
+    var circle = new fabric.Circle({
+        id:id,
+        left : object.left,
+        top :object.top,
+        radius : object.radius,
+        scaleX: object.scaleX,
+        scaleY: object.scaleY,
+        angle: object.angle,
+        stroke:object.stroke,
+        fill : object.fill
+    });
+    canvas.add(circle);
+    return circle;
+}
+function draw_pathOnce(id,data){
+    var id =  id;
+    var object = data
+          var path = new fabric.Path(data.path, {
+              id: id,
+              angle: object.angle,
+              strokeWidth: object.strokeWidth,
+              stroke: object.stroke,
+              fill: object.fill,
+              top: object.top,
+              scaleX: object.scaleX,
+              scaleY: object.scaleY,
+              width : object.width,
+              height : object.height,
+              left: object.left,
+              originX: object.originX,
+              originY: object.originY
+             // originX: 'left',
+             // originY: 'top'
+          });
+          canvas.add(path);
+          return path;
+  }
+function draw_object_by_type(data){
+    if(data.object.type=="rect"){
+        draw_rect(data);
+       }else if(data.object.type=="text"){
+           draw_text(data);
+       } else if(data.object.type=="triangle"){
+           draw_triangle(data);
+       }else if(data.object.type=="circle"){
+           draw_circle(data);
+       }else if(data.object.type=='path'){
+        draw_path(data)
+       }else if(data.object.type=='image'){
+        draw_Image(data)
+       }
+}
+function draw_rect(data){
+    var id =  data.id;
+    var object = data.object
+    var rect = new fabric.Rect({
+        id:id,
+        left : object.left,
+        top :object.top,
+        width : object.width,
+        height : object.height,
+        scaleX: object.scaleX,
+        scaleY: object.scaleY,
+        angle: object.angle,
+        stroke:object.stroke,
+        fill : object.fill
+    });
+    canvas.add(rect);
+    return rect;
+}
+function draw_text(data){
+  var id =  data.id;
+  var object = data.object;
+  var text = new fabric.Text(object.text, {
+  id: id,
+  fontSize: object.fontSize,
+  fontFamily: object.fontFamily,
+  fontWeight: object.fontWeight,
+  fontStyle: object.fontStyle,
+  textDecoration: object.textDecoration,
+  originX: object.originX,
+  originY: object.originY,
+  fill: object.fill,
+  stroke: object.stroke,
+  left : object.left,
+  scaleX: object.scaleX,
+  scaleY: object.scaleY,
+  angle: object.angle,
+  top :object.top
+});
+  canvas.add(text)
+  return text;
+}
+function draw_triangle(data){
+    var id =  data.id;
+    var object = data.object
+    var triangle = new fabric.Triangle({
+        id:id,
+        left : object.left,
+        top :object.top,
+        width : object.width,
+        height : object.height,
+        scaleX: object.scaleX,
+        scaleY: object.scaleY,
+        angle: object.angle,
+        stroke:object.stroke,
+        fill : object.fill
+    });
+    canvas.add(triangle);
+    return triangle;
+}
+function draw_circle(data){
+    var id =  data.id;
+    var object = data.object
+    var circle = new fabric.Circle({
+        id:id,
+        left : object.left,
+        top :object.top,
+        radius : object.radius,
+        scaleX: object.scaleX,
+        scaleY: object.scaleY,
+        angle: object.angle,
+        stroke:object.stroke,
+        fill : object.fill
+    });
+    canvas.add(circle);
+    return circle;
+}
+function draw_path(data){
+    var id =  data.id;
+    var object = data.object
+          var path = new fabric.Path(object.path, {
+              stroke:object.stroke,
+              id: id,
+              angle: object.angle,
+              strokeWidth: object.strokeWidth,
+              stroke: object.stroke,
+              fill: object.fill,
+              top: object.top,
+              scaleX: object.scaleX,
+              scaleY: object.scaleY,
+              width : object.width,
+              height : object.height,
+              left: object.left,
+              originX: object.originX,
+              originY: object.originY
+          });
+          canvas.add(path);
+          return path;
+}
+function draw_Image(data){
+    var id =  data.id;
+    var object = data.object
+  fabric.Image.fromURL(object.src, function(img) {
+    img.set({
+        id: id,
+        left : object.left,
+        top :object.top,
+        width : object.width,
+        height : object.height,
+        stroke:object.stroke,
+        scaleX: object.scaleX,
+        scaleY: object.scaleY,
+        angle: object.angle,
+        fill : object.fill
+    });
+    canvas.add(img);
+  });
+}
 function addImg(myImg){
     fabric.Image.fromURL(myImg, function(oImg) {
         oImg.set('id', parseInt(j));
@@ -65,13 +382,51 @@ function addImg(myImg){
         oImg.set({'left':100});
         oImg.set({'top':100});
         oImg.set('id', j);
-        j++;
-          emitUpdate()
+        j++;console.log(j)
+            canvas.add(oImg);
         });
 }
+socket.on('removeObj', function(o){
+  console.log(o+' deleted')
+    const canvasObject = getObjectFromCanvasById(o)
+    canvas.remove(canvasObject)
+});
+socket.on('bringToFront', function(o){
+  const canvasObject = getObjectFromCanvasById(o);
+  //console.log(canvasObject)
+  canvas.bringToFront(canvasObject);
+})
+socket.on('sendToBack', function(o){
+  const canvasObject = getObjectFromCanvasById(o);
+  //console.log(canvasObject)
+  canvas.sendToBack(canvasObject);
+})
+function getObjectFromCanvasById(id) {
+  console.log(id)
+    const canvasObject = window.canvas.getObjects().filter((item) => {
+        return item.id === parseInt(id)
+
+    })
+    return canvasObject[0]
+}
+function indexes(){
+  var indexes = [];
+  var items = window.canvas.getObjects();
+  items.forEach(function(item){
+    //console.log(item.get('id')+'-->'+window.canvas.getObjects().indexOf(item))
+    indexes.push({
+                  id: item.get('id'),
+                  pos: window.canvas.getObjects().indexOf(item)
+                });
+  })
+  return indexes;
+  //console.log('a'+items)
+}
+
 </script>
-<h3 class="page-header" style = "margin-top:10px">&nbsp;Whiteboard <small>v1.5_beta</small></h3><span id="jj"></span>
+<h3 class="page-header" style = "margin-top:10px">&nbsp;Whiteboard <small>v1.3_beta</small></h3><span id="jj"></span>
 <div style="float:left;z-index:1000">
+  <!--<button id="test">test</button>-->
 
     <canvas id="myCanvas" width="955" height="500" style="border:1px dotted black; margin-left:10px">
       <p>This is fallback content
@@ -79,6 +434,7 @@ function addImg(myImg){
       or of browsers that don't have
       full support for the Canvas API.</p>
     </canvas>
+
 
   <div class="col-md-3" style="float:left;">
     <h5>Shapes</h5>
@@ -127,6 +483,8 @@ function addImg(myImg){
        </ul>
     </div>
 
+
+
   </div>
   <div class="col-md-3" style="float:left, text-align: center;">
     <h5>Color Picker</h5>
@@ -154,6 +512,7 @@ function addImg(myImg){
       <button class="btn btn-default" id="textItalic"><i class="fa fa-italic"></i></button>
       <button class="btn btn-default" id="textUnderline"><i class="fa fa-underline"></i></button>
       <button class="btn btn-default" id="textStrike"><i class="fa fa-strikethrough"></i></button>
+      <!-- <div> -->
         <input type="hidden" value="times" id="textFont"/>
         <input type="hidden" value="20" id="textSize"/>
         <div class="btn-group">
@@ -176,6 +535,7 @@ function addImg(myImg){
               <li class="size" id="44"><a href="#">44 px</a></li>
             </ul>
           </button>
+        <!-- </div> -->
         </div>
   </div>
   <div class="clearfix"></div>
@@ -188,13 +548,15 @@ function addImg(myImg){
       <button class="btn btn-default" id="paint"><i class="fa fa-paint-brush"></i></button>
 
   </div>
+  <!-- <button id="remove">remove</button> -->
   <div>
     <h5>Edit</h5>
       <button class="btn btn-default" id="removeMany"><i class="fa fa-trash-o"></i></button>
-      <button class="btn btn-default" id="group"><i class="fa fa-object-group"></i></button>
-      <button class="btn btn-default" id="ungroup"><i class="fa fa-object-ungroup"></i></button>
+      <button class="btn btn-default" id="group" disabled><i class="fa fa-object-group"></i></button>
+      <button class="btn btn-default" id="ungroup" disabled><i class="fa fa-object-ungroup"></i></button>
       <button class="btn btn-default" id="forward"><i class="fa fa-level-up"></i></button>
       <button class="btn btn-default" id="back"><i class="fa fa-level-down"></i></button>
+
   </div>
   <div>
     <h5>File</h5>
@@ -204,21 +566,11 @@ function addImg(myImg){
       <button class="btn btn-default" id="help"><i class="fa fa-question"></i></button>
   </div>
 </div>
+
   <div class="panel-group" id="accordion" style="position: fixed; bottom:0;left:0; width:100%;padding:0; margin:0">
     <div class="panel panel-default">
       <div id="collapse1" class="panel-collapse collapse out">
         <div class="panel-body" style="max-height: 450px; overflow-y:scroll">
-          <p>
-            <u>Apr 29 - 30, 2017 - v1.5_beta, </u>
-            <ul>
-              <li> Changed drawing algorithm, added JSON emit</li>
-              <li> Added more advanced shapes and changed all to svgs</li>
-              <li> Fixed issues with multiple images on canvas and moving multiple shapes </li>
-              <li> Re-enabled group and ungroup functions</li>
-              <li> Code refactoring and cleanup (added 145 lines, removed 552)</li>
-            </ul>
-          </p>
-          <p>
           <p>
             <u>Apr 28, 2017 - v1.3_beta</u>
             <ul>
@@ -262,6 +614,7 @@ function addImg(myImg){
               </li>
             </ul>
           </p>
+
         </div>
       </div>
       <div class="panel-footer" style="height:15px; padding:0; margin:0">
@@ -281,7 +634,13 @@ $(".font").on('click', function(){
   $('#textFont').val(id);
 })
 $("#svg").on('click', function(){
-  emitUpdate()
+  var json = JSON.stringify(canvas);
+//   $('body').append('<canvas id="xxx" width="300" height"300" style="border 1px solid black; z-index:999"></canvas>');
+// var canvas2 = window._canvas = new fabric.Canvas('xxx');
+//     canvas2.loadFromJSON(json, canvas2.renderAll.bind(canvas2), function(o, object) {
+//       fabric.log(o, object);
+//   });
+  socket.emit('update', json);
 })
 $(".size").on('click', function(){
   var id = $(this).attr('id');
@@ -338,22 +697,22 @@ $('#clear').on('click', function(){
   j=0;
 })
 $("#forward").on('click', function(){
-    var activeObject = canvas.getActiveObject(),
-        activeGroup = canvas.getActiveGroup();
-  // canvas.sendBackwards(myObject)
-  // canvas.sendToBack(myObject)
-  // canvas.bringForward(myObject)
-  canvas.bringToFront(activeObject)
-  emitUpdate()
+  var activeObject = canvas.getActiveObject(),
+      activeGroup = canvas.getActiveGroup();
+// canvas.sendBackwards(myObject)
+// canvas.sendToBack(myObject)
+// canvas.bringForward(myObject)
+canvas.bringToFront(activeObject)
+socket.emit('bringToFront',canvas.getActiveObject().id)
 })
 $("#back").on('click', function(){
-    var activeObject = canvas.getActiveObject(),
-        activeGroup = canvas.getActiveGroup();
-  // canvas.sendBackwards(myObject)
-  canvas.sendToBack(activeObject)
-  emitUpdate()
-  // canvas.bringForward(myObject)
-  //canvas.bringToFront(activeObject)
+  var activeObject = canvas.getActiveObject(),
+      activeGroup = canvas.getActiveGroup();
+// canvas.sendBackwards(myObject)
+canvas.sendToBack(activeObject)
+socket.emit('sendToBack',canvas.getActiveObject().id)
+// canvas.bringForward(myObject)
+//canvas.bringToFront(activeObject)
 })
 $("#save").on('click', function(){
   var save = document.getElementById("myCanvas"), ctx = canvas.getContext("2d");
@@ -372,7 +731,6 @@ $('#group').on('click', function(){
           canvas.remove(object);
       });
       canvas.add(newgroup);
-emitUpdate()
   });
 });
 $("#ungroup").click(function(){
@@ -387,86 +745,162 @@ $("#ungroup").click(function(){
           canvas.item(canvas.size()-1).hasControls = true;
         }
         canvas.renderAll();
-emitUpdate()
     }
 });
 
 $('#removeMany').on('click', function(){
 if(canvas.getActiveGroup()){
-      canvas.getActiveGroup().forEachObject(function(o){ canvas.remove(o); });
+      canvas.getActiveGroup().forEachObject(function(o){ canvas.remove(o);socket.emit('removeObject', o.id) });
 
       canvas.discardActiveGroup().renderAll();
     } else {
       var o=canvas.getActiveObject();
       canvas.remove(canvas.getActiveObject());
+      socket.emit('removeObject', o.id)
     }
-emitUpdate()
 })
+
 $("#rectangle").on('click', function(e) {
+  //e.preventDefault();
   var color = $("#selectColor").val();
   var stroke = $("#selectColor2").val();
   rectangle(color,stroke,125,75,100,100);
+  //socket.emit('rect', color, 125,75,100,100)
 })
 $("#line").on('click', function(e) {
+  //e.preventDefault();
   var color = $("#selectColor").val();
   rectangle(color,color, 125,3,100,100);
+  //socket.emit('rect', color, 125,75,100,100)
 })
 $("#triangle").on('click', function(e) {
+  //e.preventDefault();
   var color = $("#selectColor").val();
   var stroke = $("#selectColor2").val();
   triangle(color, stroke);
+  //socket.emit('rect', color, 125,75,100,100)
 })
 $("#circle").on('click', function(e) {
+  //e.preventDefault();
   var stroke = $("#selectColor2").val();
   var color = $("#selectColor").val();
   circle(color, stroke);
+  //socket.emit('rect', color, 125,75,100,100)
 })
 $("#lineVertical").on('click', function(e) {
+  //e.preventDefault();
   var color = $("#selectColor").val();
   rectangle(color,color, 3,125,100,100);
-
+  //socket.emit('rect', color, 125,75,100,100)
 })
-$("#addServer").on('click', function(e) { addImg(serverImg);  })
-$("#addServers").on('click', function(e) {  addImg(serversImg); })
-$("#addLib").on('click', function(e) {  addImg(libImg); })
-$("#addPC").on('click', function(e) { addImg(pcImg);  })
-$("#addDb").on('click', function(e) { addImg(dbImg);  })
-$("#addArrow").on('click', function(e) {  addImg(arrow);  })
-$("#addArrows").on('click', function(e) {  addImg(arrows); })
-$("#addCache").on('click', function(e) {  addImg(cache);  })
-$("#addFtp").on('click', function(e) {  addImg(ftp);  })
-$("#addUnc").on('click', function(e) {  addImg(unc);  })
-$("#addPC2").on('click', function(e) {  addImg(pcImg2); })
-$("#addLib2").on('click', function(e) {  addImg(libImg2);  })
+$("#addServer").on('click', function(e) {
+  addImg(serverImg);
+})
+$("#addServers").on('click', function(e) {
+  addImg(serversImg);
+})
+$("#addLib").on('click', function(e) {
+  addImg(libImg);
+})
+$("#addPC").on('click', function(e) {
+  addImg(pcImg);
+})
+$("#addDb").on('click', function(e) {
+  addImg(dbImg);
+})
+$("#addArrow").on('click', function(e) {
+  addImg(arrow);
+})
+$("#addArrows").on('click', function(e) {
+  addImg(arrows);
+})
+$("#addCache").on('click', function(e) {
+  addImg(cache);
+})
+$("#addFtp").on('click', function(e) {
+  addImg(ftp);
+})
+$("#addUnc").on('click', function(e) {
+  addImg(unc);
+})
+$("#addPC2").on('click', function(e) {
+  addImg(pcImg2);
+})
+$("#addLib2").on('click', function(e) {
+  addImg(libImg2);
+})
 // create a wrapper around native canvas element (with id="c")
 var canvas = new fabric.Canvas('myCanvas', {preserveObjectStacking: false});
 
-canvas.on('object:modified', function(){
-  emitUpdate()
-},false);
-modified = false;
-canvas.on('path:created', function() {
-  emitUpdate()
+ canvas.on('object:modified', function(options){
+            console.info("object modified",options)
+            //canvas.deactivateAllWithDispatch()//deselect all objects
+
+            var index = indexes();
+            //console.log(objects)
+           // if(options.target.type!='path'){
+              socket.emit('send_redraw', {id:options.target.id,object:options.target, index:index});
+            //}
+
+    },false);
+
+canvas.on('path:created', function(event) {
+    //log the svg path  info
+   console.log(event.path);
+   //socket.emit('canvas', event.path.path, event.path.left, event.path.top);
+   //event.path.id = fabric.Object.__uid++;
+   //event.path.setStroke('red')
+   event.path.id = j;
+   j++;
+   //socket.emit('pathadded', event.path);
+   socket.emit('objAddOnce', event.path.id,event.path);
+})
+canvas.on('object:modified', function(event) {
+    //var modifiedObject = event.target;
+    //console.log(modifiedObject.get('left'), modifiedObject.get('top'));
 })
 canvas.on('object:added', function(options) {
-//do nothing
+          socket.emit('objAddOnce', options.target.id,options.target);
 }, false)
+
 // create a rectangle object
 function rectangle(color,stroke, width, height, left, top){
   var rect = new fabric.Rect({
-    id: j,left: left,top: top,fill: color,stroke: stroke,width: width,height: height
+    id: j,
+    left: left,
+    top: top,
+    fill: color,
+    stroke: stroke,
+    width: width,
+    height: height
   });
   canvas.add(rect);
-emitUpdate()
+  j++;
 }
-function text(label, fill, stroke){
+function text(label, color, stroke){
   var font = $("#textFont").val();
-  var fontSize = $("#textSize").val();
+  var size = $("#textSize").val();
 
-  var fontWeight = ($("#textBold").hasClass('active') ? 'bold' : 'normal');
-  var fontStyle = ($("#textItalic").hasClass('active') ? 'italic' : 'normal');
-  var textDecoration1 = ($("#textUnderline").hasClass('active') ? 'underline' : '');
-  var textDecoration2 = ($("#textStrike").hasClass('active') ? 'line-through' : '');
+  if($("#textBold").hasClass('active')){
+    fontWeight = 'bold';
+  }else{
+    fontWeight ='normal';
+  }
+  if($("#textItalic").hasClass('active')){
+    fontStyle = 'italic';
+  }else{
+    fontStyle ='normal';
+  }
+    if($("#textUnderline").hasClass('active')){
+    textDecoration1 = 'underline';
+  }else{
+    textDecoration1 ='';
+  }
+    if($("#textStrike").hasClass('active')){
+    textDecoration2 = 'line-through';
+  }else{
+    textDecoration2 ='';
+  }
 
 if(textDecoration1!='' && textDecoration2 !=''){
   textDecoration = textDecoration1+','+textDecoration2;
@@ -477,37 +911,56 @@ if(textDecoration1!='' && textDecoration2 !=''){
     textDecoration = textDecoration1;
   }
 }
-  switch (font) {
-    case 'times': fontFamily = 'Times New Roman, Times, serif'; break;
-    case 'arial': fontFamily = 'Arial, Helvetica, sans-serif'; break;
-    case 'verdana': fontFamily = 'Verdana,Geneva,sans-serif'; break;
-    case 'comic': fontFamily = '"Comic Sans MS", cursive, sans-serif'; break;
-    case 'courier': fontFamily = '"Courier New", Courier, monospace'; break;
+
+  if(font=='times'){
+    fontFamily = 'Times New Roman, Times, serif';
   }
+  if(font=='arial'){
+    fontFamily = 'Arial, Helvetica, sans-serif';
+  }
+  if(font=='verdana'){
+    fontFamily = 'Verdana,Geneva,sans-serif';
+  }
+  if(font=='comic'){
+    fontFamily = '"Comic Sans MS", cursive, sans-serif';
+  }
+  if(font=='courier'){
+    fontFamily = '"Courier New", Courier, monospace';
+  }
+
   var text = new fabric.Text(label, {
-    id: j,fontFamily,fontWeight,fontStyle,textDecoration,fontSize,fill,stroke,originX: 'center',originY: 'center',left: 100,top: 100,
-  });
+  id: j,
+  fontFamily: fontFamily,
+  fontWeight: fontWeight,
+  fontStyle: fontStyle,
+  textDecoration: textDecoration,
+  fontSize: size,
+  fill: color,
+  stroke: stroke,
+  originX: 'center',
+  originY: 'center',
+  left: 100,
+  top: 100,
+});
   canvas.add(text)
-emitUpdate()
-}
-function circle(fill, stroke){
-  var circle = new fabric.Circle({
-    id:j,radius: 30, fill, left: 100, top: 100, stroke
-  });
-  canvas.add(circle)
-emitUpdate()
-}
-function triangle(fill, stroke){
-  var triangle = new fabric.Triangle({
-    id:j,width: 50, height: 50, fill, left: 50, top: 50, stroke
-  });
-  canvas.add(triangle)
-emitUpdate()
-}
-function emitUpdate(){
   j++;
-  modified=true;
-  var json = JSON.stringify(canvas);
-  socket.emit('update', json, j);
 }
-</script>
+function circle(color, stroke){
+  var circle = new fabric.Circle({
+    id:j,
+  radius: 30, fill: color, left: 100, top: 100, stroke:stroke
+});
+  canvas.add(circle)
+  j++;
+}
+function triangle(color, stroke){
+  var triangle = new fabric.Triangle({
+  id:j,
+  width: 50, height: 50, fill: color, left: 50, top: 50, stroke:stroke
+});
+  canvas.add(triangle)
+  j++;
+}
+
+
+  </script>

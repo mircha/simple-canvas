@@ -19,39 +19,11 @@ io.sockets.on('connection', function(socket){
 		socketid.splice(index, 1);
 		console.log(socket.id + ' disconnected')
 	})
-	socket.on('pathadded', function(path){
-		//console.log(data)
-		socket.broadcast.to('chat').emit('add path', path);
-		//io.emit('message', 'blah');
-	})
-	socket.on('rect', function( color, w,h,t,l){
-		//console.log(data)
-		socket.broadcast.to('chat').emit('rect', color, w,h,t,l);
-		//io.emit('message', 'blah');
-	})
-	socket.on('send_redraw', function( data){
-		console.log(data)
-		socket.broadcast.to('chat').emit('do_redraw', data);
-		//io.emit('message', 'blah');
-	})
-	socket.on('objAddOnce', function( id, data){
-		//console.log(data)
-		socket.broadcast.to('chat').emit('drawObj', id, data);
-		console.log(data.type)
-		//io.emit('message', 'blah');
+	socket.on('update', function(json, k){
+		socket.broadcast.to('chat').emit('updateCanvas', json, k);
 	})
 	socket.on('clear', function(){
 		socket.broadcast.to('chat').emit('clearCanvas');
-	})
-	socket.on('removeObject', function(o){
-		console.log('Removed object with id:'+o+'  '+o.id);
-		socket.broadcast.to('chat').emit('removeObj',o);
-	})
-	socket.on('bringToFront', function(o){
-		socket.broadcast.to('chat').emit('bringToFront',o);
-	})
-	socket.on('sendToBack', function(o){
-		socket.broadcast.to('chat').emit('sendToBack',o);
 	})
 });
 
