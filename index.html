@@ -66,10 +66,12 @@ function addImg(myImg){
         oImg.set({'top':100});
         oImg.set('id', j);
         j++;
+          canvas.add(oImg)
           emitUpdate()
         });
 }
 </script>
+
 <h3 class="page-header" style = "margin-top:10px">&nbsp;Whiteboard <small>v1.5_beta</small></h3><span id="jj"></span>
 <div style="float:left;z-index:1000">
 
@@ -104,22 +106,22 @@ function addImg(myImg){
          </button>
 
        <ul class = "dropdown-menu" role = "menu" style="text-align: center">
-         <li>
+         <li class="btn-group">
           <button class="btn btn-default" style="font-size: 21px" id="addServer"><i class="glyphicon glyphicon-hdd"></i></button>
           <button class="btn btn-default" style="font-size: 21px" id="addServers"><i class="fa fa-server"></i></button>
           <button class="btn btn-default" style="font-size: 21px; width: 46px" id="addPC"><i class="fa fa-laptop"></i></button>
         </li>
-        <li>
+        <li class="btn-group">
           <button class="btn btn-default" style="font-size: 21px" id="addLib"><img style="width: 21px; height:21px" src="img/library2.svg"/></button>
           <button class="btn btn-default" style="font-size: 21px; width: 47px" id="addDb"><i class="fa fa-database"></i></button>
           <button class="btn btn-default" style="font-size: 21px; width: 46px" id="addArrow"><i class="fa fa-arrow-right"></i></button>
         </li>
-        <li>
+        <li class="btn-group">
           <button class="btn btn-default" style="font-size: 21px" id="addFtp"><img style="width: 21px; height:21px;" src="img/antenna.svg"/></button>
           <button class="btn btn-default" style="font-size: 21px" id="addUnc"><img style="width: 21px; height:21px;" src="img/network.svg"/></i></button>
           <button class="btn btn-default" style="font-size: 21px" id="addArrows"><i class="fa fa-exchange fa-rotate-90"></i></button>
         </li>
-        <li>
+        <li class="btn-group">
           <button class="btn btn-default" style="font-size: 21px" id="addLib2"><img style="width: 21px; height:21px;" src="img/library.svg"/></button>
           <button class="btn btn-default" style="font-size: 21px" id="addPC2"><img style="width: 21px; height:21px;" src="img/server2.svg"/></i></button>
           <button class="btn btn-default" style="font-size: 21px" id="addCache"><img style="width: 21px; height:21px;" src="img/database-alt1.svg"/></i></button>
@@ -149,11 +151,13 @@ function addImg(myImg){
   <div class="col-md-6.5" style="display:inline">
     <h5>Text</h5>
       <input type="text" class="form-control" id="label" placeholder="Insert text here" style="width:175px; float:left">
-      <button class="btn btn-default" id="addText"><i class="fa fa-text-width"></i></button>
+      <button class="btn btn-default" id="addText"><img src="img/text.svg" style="width:19px; height:19px"/></button>
+      <div class="btn-group">
       <button class="btn btn-default" id="textBold"><i class="fa fa-bold"></i></button>
       <button class="btn btn-default" id="textItalic"><i class="fa fa-italic"></i></button>
       <button class="btn btn-default" id="textUnderline"><i class="fa fa-underline"></i></button>
       <button class="btn btn-default" id="textStrike"><i class="fa fa-strikethrough"></i></button>
+    </div>
         <input type="hidden" value="times" id="textFont"/>
         <input type="hidden" value="20" id="textSize"/>
         <div class="btn-group">
@@ -183,25 +187,32 @@ function addImg(myImg){
 <div class="col-md-3" style="text-align:left!important" style="width:24%">
   <div style="overflow:none; z-index:-10">
     <h5>Mode</h5>
-      <button class="btn btn-default" id="noDraw"><i class="fa fa-arrows"></i></button>
-      <button class="btn btn-default" id="draw"><i class="glyphicon glyphicon-pencil"></i></button>
-      <button class="btn btn-default" id="paint"><i class="fa fa-paint-brush"></i></button>
+    <div class="btn-group">
+      <button class="btn btn-default" style="font-size: 21px" id="noDraw"><img src="img/select.svg" style="width:21px; height:21px"/></button>
+      <button class="btn btn-default" style="font-size: 21px" id="draw"><i class="glyphicon glyphicon-pencil"></i></button>
+      <button class="btn btn-default" style="font-size: 21px" id="paint"><i class="fa fa-paint-brush"></i></button>
+      <button class="btn btn-default" style="font-size: 21px" id="clone"><img src="img/clone.svg" style="width:21px; height:21px"/></button>
+    </div>
 
   </div>
   <div>
     <h5>Edit</h5>
-      <button class="btn btn-default" id="removeMany"><i class="fa fa-trash-o"></i></button>
-      <button class="btn btn-default" id="group"><i class="fa fa-object-group"></i></button>
-      <button class="btn btn-default" id="ungroup"><i class="fa fa-object-ungroup"></i></button>
-      <button class="btn btn-default" id="forward"><i class="fa fa-level-up"></i></button>
-      <button class="btn btn-default" id="back"><i class="fa fa-level-down"></i></button>
+    <div class="btn-group">
+      <button class="btn btn-default" style="font-size: 21px" id="removeMany"><i class="fa fa-trash-o"></i></button>
+      <button class="btn btn-default" style="font-size: 21px" id="group"><i class="fa fa-object-group"></i></button>
+      <button class="btn btn-default" style="font-size: 21px" id="ungroup"><i class="fa fa-object-ungroup"></i></button>
+      <button class="btn btn-default" style="font-size: 21px" id="forward"><i class="fa fa-level-up"></i></button>
+      <button class="btn btn-default" style="font-size: 21px" id="back"><i class="fa fa-level-down"></i></button>
+    </div>
   </div>
   <div>
     <h5>File</h5>
-      <button class="btn btn-default" id="save"><i class="fa fa-floppy-o"></i></button>
-      <button class="btn btn-default" id="clear"><i class="fa fa-clone"></i></button>
-      <button class="btn btn-default" id="svg"><i class="fa fa-code"></i></button>
-      <button class="btn btn-default" id="help"><i class="fa fa-question"></i></button>
+    <div class="btn-group">
+      <button class="btn btn-default" style="font-size: 21px" id="save"><i class="fa fa-floppy-o"></i></button>
+      <button class="btn btn-default" style="font-size: 21px" id="clear"><img src="img/clean.svg" style="width:21px; height:21px"/></button>
+      <button class="btn btn-default" style="font-size: 21px" id="svg"><img src="img/laptop-code.svg" style="width:21px; height:21px"/></button>
+      <button class="btn btn-default" style="font-size: 21px" id="help" data-toggle="modal" data-target="#helpModal"><i class="fa fa-question"></i></button>
+    </div>
   </div>
 </div>
   <div class="panel-group" id="accordion" style="position: fixed; bottom:0;left:0; width:100%;padding:0; margin:0">
@@ -390,7 +401,6 @@ $("#ungroup").click(function(){
 emitUpdate()
     }
 });
-
 $('#removeMany').on('click', function(){
 if(canvas.getActiveGroup()){
       canvas.getActiveGroup().forEachObject(function(o){ canvas.remove(o); });
@@ -400,6 +410,20 @@ if(canvas.getActiveGroup()){
       var o=canvas.getActiveObject();
       canvas.remove(canvas.getActiveObject());
     }
+emitUpdate()
+})
+$("#clone").on('click', function(){
+  var copyData = canvas.getActiveObject().toObject();
+  canvas.deactivateAll().renderAll();
+  fabric.util.enlivenObjects([copyData], function(objects) {
+    objects.forEach(function(o) {
+      o.set("id", j);
+      j++;
+      o.set('top', o.top + 15);
+      o.set('left', o.left + 15);
+      canvas.add(o);
+    });
+})
 emitUpdate()
 })
 $("#rectangle").on('click', function(e) {

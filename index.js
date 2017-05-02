@@ -36,6 +36,7 @@ app.get('/', function(req, res) {
 });
 app.use('/js', express.static(path.join(__dirname, 'js')))
 app.use('/img', express.static(path.join(__dirname, 'img')))
+app.use('/help', express.static(path.join(__dirname, 'help')))
 
 http.listen(3000, function(){
 	console.log('listening on port 3000!')
