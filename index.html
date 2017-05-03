@@ -19,7 +19,10 @@
 
 <script type="text/javascript">
 var socketid='';
- //var socket = io('http://192.168.0.112:3000');
+
+
+// var socket = io('http://192.168.0.112:3000');
+
 var socket = io('http://127.0.0.1:3000');
 var j=0;
 var k=0;
@@ -42,10 +45,10 @@ var news = "img/news.svg";
 var lineH = "img/substract.svg";
 var lineD='img/diagonal-line.svg';
 var lineV='img/icon.svg';
+
 socket.on('connect', function () {
   socket.on('socketid', function (socket) {
     socketid = socket;
-    //$("#myId").text(socket);
   });
   socket.on('clearCanvas',function(){
     canvas.clear();
@@ -62,7 +65,9 @@ function addImg(myImg){
     fabric.Image.fromURL(myImg, function(oImg) {
         oImg.set('id', parseInt(j));
         oImg.scale(0.3);
+
         if(myImg=='img/server2.svg' || myImg=='img/laptop.svg' || myImg=='img/news.svg'){
+
           oImg.scale(0.7);
          }
         oImg.set({'left':100});
@@ -74,6 +79,8 @@ function addImg(myImg){
         });
 }
 </script>
+<div style="float:left;z-index:1000">
+
 
 <nav class="navbar navbar-default" style="margin-bottom:5px">
   <div class="container-fluid">
@@ -120,7 +127,6 @@ function addImg(myImg){
 
     <div class = "btn-group dropup">
          <button type = "button" class = "btn btn-default dropdown-toggle " data-toggle = "dropdown">
-            <!-- <i class="fa fa-star-o"></i> -->
             <img src="img/shapes.svg" style="width: 23px; height:23px;" />
             <span class = "caret"></span>
          </button>
@@ -137,8 +143,6 @@ function addImg(myImg){
           <button class="btn btn-default" style="font-size: 21px" id="circleO"><i class="fa fa-circle-thin"></i></button>
         </li>
         <li class="btn-group">
-          <!-- <button class="btn btn-default" style="font-size: 21px" id="line"><i class="fa fa-arrows-h"></i></button> -->
-          <!-- <button class="btn btn-default" style="font-size: 21px" id="lineVertical"><i class="fa fa-arrows-v"></i></button> -->
           <button class="btn btn-default" style="font-size: 21px" id="line"><img src="img/substract.svg" style="width: 18px; height:21px;"/></button>
           <button class="btn btn-default" style="font-size: 21px" id="lineVertical"><img src="img/icon.svg" style="width: 18px; height:21px;"/></button>
           <button class="btn btn-default" style="font-size: 21px" id="lineDiag"><img src="img/diagonal-line.svg" style="width: 18px; height:21px;"/></button>
@@ -207,6 +211,7 @@ function addImg(myImg){
         <button class="btn btn-default" id="textUnderline"><i class="fa fa-underline"></i></button>
         <button class="btn btn-default" id="textStrike"><i class="fa fa-strikethrough"></i></button>
       </div>
+    </div>
         <input type="hidden" value="times" id="textFont"/>
         <input type="hidden" value="20" id="textSize"/>
         <div class="btn-group">
@@ -259,6 +264,36 @@ function addImg(myImg){
     <span class="sr-only">Next</span>
   </a>
 <button class="btn btn-default" id="closeHelp">Close Help</button>
+<div class="col-md-3" style="text-align:left!important" style="width:24%">
+  <div style="overflow:none; z-index:-10">
+    <h5>Mode</h5>
+    <div class="btn-group">
+      <button class="btn btn-default" style="font-size: 21px" id="noDraw"><img src="img/select.svg" style="width:21px; height:21px"/></button>
+      <button class="btn btn-default" style="font-size: 21px" id="draw"><i class="glyphicon glyphicon-pencil"></i></button>
+      <button class="btn btn-default" style="font-size: 21px" id="paint"><i class="fa fa-paint-brush"></i></button>
+      <button class="btn btn-default" style="font-size: 21px" id="clone"><img src="img/clone.svg" style="width:21px; height:21px"/></button>
+    </div>
+
+  </div>
+  <div>
+    <h5>Edit</h5>
+    <div class="btn-group">
+      <button class="btn btn-default" style="font-size: 21px" id="removeMany"><i class="fa fa-trash-o"></i></button>
+      <button class="btn btn-default" style="font-size: 21px" id="group"><i class="fa fa-object-group"></i></button>
+      <button class="btn btn-default" style="font-size: 21px" id="ungroup"><i class="fa fa-object-ungroup"></i></button>
+      <button class="btn btn-default" style="font-size: 21px" id="forward"><i class="fa fa-level-up"></i></button>
+      <button class="btn btn-default" style="font-size: 21px" id="back"><i class="fa fa-level-down"></i></button>
+    </div>
+  </div>
+  <div>
+    <h5>File</h5>
+    <div class="btn-group">
+      <button class="btn btn-default" style="font-size: 21px" id="save"><i class="fa fa-floppy-o"></i></button>
+      <button class="btn btn-default" style="font-size: 21px" id="clear"><img src="img/clean.svg" style="width:21px; height:21px"/></button>
+      <button class="btn btn-default" style="font-size: 21px" id="svg"><img src="img/laptop-code.svg" style="width:21px; height:21px"/></button>
+      <button class="btn btn-default" style="font-size: 21px" id="help" data-toggle="modal" data-target="#helpModal"><i class="fa fa-question"></i></button>
+    </div>
+  </div>
 </div>
   <div class="panel-group" id="accordion" style="position: fixed; bottom:0;left:0; width:100%;padding:0; margin:0">
     <div class="panel panel-default">
@@ -286,6 +321,7 @@ function addImg(myImg){
           </p>
           <p>
             <u>Apr 29 - 30, 2017 - v1.5_beta </u>
+
             <ul>
               <li> Changed drawing algorithm, added JSON emit</li>
               <li> Added more advanced shapes and changed all to svgs</li>
@@ -375,7 +411,6 @@ $("body").on('mouseout',".svg", function(){
 })
 $("body").on('mouseover',".svg", function(){
         var $img = jQuery(this).find('svg');
-
             $svg=$img;
             $svg.attr('fill', 'black')
             $img.replaceWith($svg);  
@@ -486,15 +521,13 @@ $('#group').on('click', function(){
 emitUpdate()
   });
 });
-$("#ungroup").click(function(){
+$("#ungroup").on('click', function(){
    var activeObject = canvas.getActiveObject();
    ungroup(activeObject)
-
 });
 function ungroup(activeObject){
   if(activeObject.type=="group"){
         var items = activeObject._objects;
-        //alert(items);
         activeObject._restoreObjectsState();
         canvas.remove(activeObject);
         for(var i = 0; i < items.length; i++) {
@@ -508,7 +541,6 @@ function ungroup(activeObject){
 $('#removeMany').on('click', function(){
 if(canvas.getActiveGroup()){
       canvas.getActiveGroup().forEachObject(function(o){ canvas.remove(o); });
-
       canvas.discardActiveGroup().renderAll();
     } else {
       var o=canvas.getActiveObject();
@@ -535,23 +567,31 @@ $("#clone").on('click', function(){
       o.set('top', o.top + 15);
       o.set('left', o.left + 15);
       canvas.add(o);
+
       object=o;
       emitUpdate()
     });
     if(group) ungroup(object)
-})
+});
 emitUpdate()
-})
+});
+
 $("#rectangle").on('click', function(e) {
   var color = $("#selectColor").val();
   var stroke = $("#selectColor2").val();
   rectangle(color,stroke,125,75,100,100);
 })
+
 $("#rectangleO").on('click', function(e) {
   var color = '';
   var stroke = $("#selectColor2").val();
   rectangle(color,stroke,125,75,100,100);
+})  
+$("#line").on('click', function(e) {
+  var color = $("#selectColor").val();
+  rectangle(color,color, 125,3,100,100);
 })
+
 $("#triangle").on('click', function(e) {
   var color = $("#selectColor").val();
   var stroke = $("#selectColor2").val();
@@ -561,7 +601,9 @@ $("#triangleO").on('click', function(e) {
   var color = '';
   var stroke = $("#selectColor2").val();
   triangle(color, stroke);
+
 })
+
 $("#circle").on('click', function(e) {
   var stroke = $("#selectColor2").val();
   var color = $("#selectColor").val();
@@ -571,6 +613,10 @@ $("#circleO").on('click', function(e) {
   var stroke = $("#selectColor2").val();
   var color = '';
   circle(color, stroke);
+})
+$("#lineVertical").on('click', function(e) {
+  var color = $("#selectColor").val();
+  rectangle(color,color, 3,125,100,100);
 })
 
 $("#addServer").on('click', function(e) { addImg(serverImg);  })
@@ -592,6 +638,7 @@ $("#lineDiag").on('click', function(e) {  addImg(lineD);  })
 
 // create a wrapper around native canvas element (with id="c")
 var canvas = new fabric.Canvas('myCanvas', {preserveObjectStacking: false});
+
 canvas.on('object:modified', function(){
   emitUpdate()
 },false);
@@ -613,7 +660,6 @@ emitUpdate()
 function text(label, fill, stroke){
   var font = $("#textFont").val();
   var fontSize = $("#textSize").val();
-
   var fontWeight = ($("#textBold").hasClass('active') ? 'bold' : 'normal');
   var fontStyle = ($("#textItalic").hasClass('active') ? 'italic' : 'normal');
   var textDecoration1 = ($("#textUnderline").hasClass('active') ? 'underline' : '');
