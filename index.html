@@ -11,24 +11,37 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script><!--socketIO-->
 
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 <script type="text/javascript">
 var socketid='';
-var socket = io('http://192.168.0.112:3000');
+ //var socket = io('http://192.168.0.112:3000');
+var socket = io('http://127.0.0.1:3000');
 var j=0;
+var k=0;
+var modified = true;
+var modifiedBroadcast = false;
 
-
-var serverImg = 'img/server.png';
-var serversImg = 'img/servers.png';
-var pcImg = 'img/pc.ico';
-var libImg = 'img/library.svg';
-var dbImg = 'img/database.png';
-
+var serverImg = 'img/srv.svg';
+var serversImg = 'img/servers.svg';
+var pcImg = 'img/laptop.svg';
+var pcImg2 = 'img/server2.svg';
+var libImg = 'img/library2.svg';
+var libImg2 = 'img/library.svg';
+var dbImg = 'img/database.svg';
+var arrow = 'img/arrow.svg';
+var arrows = 'img/arrows.svg';
+var ftp = 'img/antenna.svg';
+var unc = "img/network.svg";
+var cache = 'img/database-alt1.svg';
+var news = "img/news.svg";
+var lineH = "img/substract.svg";
+var lineD='img/diagonal-line.svg';
+var lineV='img/icon.svg';
 socket.on('connect', function () {
   socket.on('socketid', function (socket) {
     socketid = socket;
@@ -38,435 +51,132 @@ socket.on('connect', function () {
     canvas.clear();
     j=0;
   });
-// socket.on('add path', function(path) {
-//   fabric.util.enlivenObjects([path], function(objects) {
-//     objects.forEach(function(o) {
-//       canvas.add(o);
-//     });
-//   });
-// });
 });
-
-socket.on('do_redraw', function (data) {
-
-  //      console.info("client_js_object_redraw:",data)
-    //    console.info("data.target.type",data.object.type)
-        var ele = canvas.getObjects()
-        //console.log(ele[0])
-
-        for (var i=0;i<ele.length;i++) {
-            var cur_object = ele[i]
-              if (data.id == cur_object.id){           
-
-                  canvas.remove(cur_object);
-                  draw_object_by_type(data)
-              }
-        }
-        //console.log(data.index)
-        var ele = canvas.getObjects()
-        for (var i=0;i<ele.length;i++) {
-          if(data.object.type!='path'){
-            canvas.moveTo(getObjectFromCanvasById(data.index[i].id),data.index[i].pos )
-          }else{
-           // var a = getObjectFromCanvasById(data.target.id)
-            //console.log(data.id, a)
-          }
-        }
-        //canvas.renderAll();
-
-});
-socket.on('drawObj', function (id, data) {
-        //console.info("client_js_object_redraw:",data)
-        //console.info("data.target.type",data.object.type)
-        var ids =[];
-        var ele = canvas.getObjects()
-        for (var i=0;i<ele.length;i++) {
-            var cur_object = ele[i]
-             ids.push(cur_object.id);
-             //console.log(cur_object.id)        
-        }
-        if(ids.includes(id)==false && id!=null){
-          //console.log(' ID: '+id)
-          data.object = data;
-                draw_object_by_typeOnce(id,data)
-                j++;
-                //console.log(' j: '+j)
-        }else{
-          //console.log('already added')
-        } 
-});
- function draw_object_by_typeOnce(id, data){
-    if(data.object.type=="rect"){
-        draw_rectOnce(id ,data);
-       }else if(data.object.type=="text"){
-           draw_textOnce(id ,data);
-       } else if(data.object.type=="triangle"){
-           draw_triangleOnce(id, data);
-       }else if(data.object.type=="circle"){
-           draw_circleOnce(id, data);
-       }else if(data.object.type=='path'){
-        draw_pathOnce(id,data)
-       }else if(data.object.type=='image'){
-        draw_ImageOnce(id, data);
-       }
-}
-function draw_ImageOnce(id, data){
-      var id =  id;
-    var object = data;
-    console.log(data.src)
-  fabric.Image.fromURL(data.src, function(img) {
-    img.set({
-        id: id,
-        left : object.left,
-        top :object.top,
-        width : object.width,
-        height : object.height,
-        stroke:object.stroke,
-        scaleX: object.scaleX,
-        scaleY: object.scaleY,
-        angle: object.angle,
-        fill : object.fill
-    });
-    canvas.add(img);
-  });
-}
-function draw_rectOnce(id,data){
-    var id =  id;
-    var object = data;
-    var rect = new fabric.Rect({
-        id:id,
-        left : object.left,
-        top :object.top,
-        width : object.width,
-        height : object.height,
-        stroke:object.stroke,
-        scaleX: object.scaleX,
-        scaleY: object.scaleY,
-        angle: object.angle,
-        fill : object.fill
-    });
-    canvas.add(rect);
-    return rect;
-}
-function draw_textOnce(id, data){
-  //console.log(data)
-  var id =  id;
-  var object = data;
-  var text = new fabric.Text(object.text, {
-  id: id,
-  fontSize: object.fontSize,
-  fontFamily: object.fontFamily,
-  fontWeight: object.fontWeight,
-  fontStyle: object.fontStyle,
-  textDecoration: object.textDecoration,
-  originX: object.originX,
-  originY: object.originY,
-  fill: object.fill,
-  stroke: object.stroke,
-  left : object.left,
-  scaleX: object.scaleX,
-  scaleY: object.scaleY,
-  angle: object.angle,
-  top :object.top
-});
-  canvas.add(text)
-  return text;
-}
-function draw_triangleOnce(id, data){
-  var id =  id;
-  var object = data;
-  var triangle = new fabric.Triangle({
-        id:id,
-        left : object.left,
-        top :object.top,
-        width : object.width,
-        height : object.height,
-        scaleX: object.scaleX,
-        scaleY: object.scaleY,
-        angle: object.angle,
-        fill : object.fill,
-        stroke:object.stroke
-});
-  canvas.add(triangle)
-  return triangle;
-}
-function draw_circleOnce(id, data){
-    var id =  id;
-    var object = data
-    var circle = new fabric.Circle({
-        id:id,
-        left : object.left,
-        top :object.top,
-        radius : object.radius,
-        scaleX: object.scaleX,
-        scaleY: object.scaleY,
-        angle: object.angle,
-        stroke:object.stroke,
-        fill : object.fill
-    });
-    canvas.add(circle);
-    return circle;
-}
-function draw_pathOnce(id,data){
-    var id =  id;
-    var object = data
-          var path = new fabric.Path(data.path, {
-              id: id,
-              angle: object.angle,
-              strokeWidth: object.strokeWidth,
-              stroke: object.stroke,
-              fill: object.fill,
-              top: object.top,
-              scaleX: object.scaleX,
-              scaleY: object.scaleY,
-              width : object.width,
-              height : object.height,
-              left: object.left,
-              originX: object.originX,
-              originY: object.originY
-             // originX: 'left',
-             // originY: 'top'
-          });
-          canvas.add(path);
-          return path;
-  }
-function draw_object_by_type(data){
-    if(data.object.type=="rect"){
-        draw_rect(data);
-       }else if(data.object.type=="text"){
-           draw_text(data);
-       } else if(data.object.type=="triangle"){
-           draw_triangle(data);
-       }else if(data.object.type=="circle"){
-           draw_circle(data);
-       }else if(data.object.type=='path'){
-        draw_path(data)
-       }else if(data.object.type=='image'){
-        draw_Image(data)
-       }
-}
-function draw_rect(data){
-    var id =  data.id;
-    var object = data.object
-    var rect = new fabric.Rect({
-        id:id,
-        left : object.left,
-        top :object.top,
-        width : object.width,
-        height : object.height,
-        scaleX: object.scaleX,
-        scaleY: object.scaleY,
-        angle: object.angle,
-        stroke:object.stroke,
-        fill : object.fill
-    });
-    canvas.add(rect);
-    return rect;
-}
-function draw_text(data){
-  var id =  data.id;
-  var object = data.object;
-  var text = new fabric.Text(object.text, {
-  id: id,
-  fontSize: object.fontSize,
-  fontFamily: object.fontFamily,
-  fontWeight: object.fontWeight,
-  fontStyle: object.fontStyle,
-  textDecoration: object.textDecoration,
-  originX: object.originX,
-  originY: object.originY,
-  fill: object.fill,
-  stroke: object.stroke,
-  left : object.left,
-  scaleX: object.scaleX,
-  scaleY: object.scaleY,
-  angle: object.angle,
-  top :object.top
-});
-  canvas.add(text)
-  return text;
-}
-function draw_triangle(data){
-    var id =  data.id;
-    var object = data.object
-    var triangle = new fabric.Triangle({
-        id:id,
-        left : object.left,
-        top :object.top,
-        width : object.width,
-        height : object.height,
-        scaleX: object.scaleX,
-        scaleY: object.scaleY,
-        angle: object.angle,
-        stroke:object.stroke,
-        fill : object.fill
-    });
-    canvas.add(triangle);
-    return triangle;
-}
-function draw_circle(data){
-    var id =  data.id;
-    var object = data.object
-    var circle = new fabric.Circle({
-        id:id,
-        left : object.left,
-        top :object.top,
-        radius : object.radius,
-        scaleX: object.scaleX,
-        scaleY: object.scaleY,
-        angle: object.angle,
-        stroke:object.stroke,
-        fill : object.fill
-    });
-    canvas.add(circle);
-    return circle;
-}
-function draw_path(data){
-    var id =  data.id;
-    var object = data.object
-          var path = new fabric.Path(object.path, {
-              stroke:object.stroke,
-              id: id,
-              angle: object.angle,
-              strokeWidth: object.strokeWidth,
-              stroke: object.stroke,
-              fill: object.fill,
-              top: object.top,
-              scaleX: object.scaleX,
-              scaleY: object.scaleY,
-              width : object.width,
-              height : object.height,
-              left: object.left,
-              originX: object.originX,
-              originY: object.originY
-          });
-          canvas.add(path);
-          return path;
-}
-function draw_Image(data){
-    var id =  data.id;
-    var object = data.object
-  fabric.Image.fromURL(object.src, function(img) {
-    img.set({
-        id: id,
-        left : object.left,
-        top :object.top,
-        width : object.width,
-        height : object.height,
-        stroke:object.stroke,
-        scaleX: object.scaleX,
-        scaleY: object.scaleY,
-        angle: object.angle,
-        fill : object.fill
-    });
-    canvas.add(img);
-  });
-}
-//var myImg = 'http://cdn.flaticon.com/png/256/1480.png';//server
-//var myImg = 'https://image.freepik.com/free-icon/server-rack_318-48050.jpg';//server
-//var myImg = 'http://freeiconbox.com/icon/256/31578.png';//server
-//var myImg = 'https://https://d30y9cdsu7xlg0.cloudfront.net/png/29558-200.png';//servers
-//var myImg = 'https://www.shareicon.net/download/2016/11/14/852368_server.svg'//servers
-//var myImg = 'https://services.vi-seem.eu/static/img/logos/hosting.png';//servers
-//var myImg = 'https://cdn2.iconfinder.com/data/icons/web-and-mobile-ui-volume-7/48/309-512.png';//database
-//var myImg = 'http://www.dcomp.ufsj.edu.br/~ronanlopes/img/icon.png';//pc
-//var myImg = 'http://www.iconarchive.com/download/i95800/iconsmind/outline/Computer-2.ico';//pc
-//var myImg = 'https://image.flaticon.com/icons/svg/31/31100.svg';//library
-//var myImg = './server.svg';//servers
-
+socket.on('updateCanvas', function(json, k){
+  canvas.loadFromJSON(json, canvas.renderAll.bind(canvas), function(o, object) {
+       fabric.log(o, object);
+       k=j;
+  })
+})
 function addImg(myImg){
-    fabric.Image.fromURL(myImg, function(oImg) {             
+    fabric.Image.fromURL(myImg, function(oImg) {
+        oImg.set('id', parseInt(j));
         oImg.scale(0.3);
+        if(myImg=='img/server2.svg' || myImg=='img/laptop.svg' || myImg=='img/news.svg'){
+          oImg.scale(0.7);
+         }
         oImg.set({'left':100});
         oImg.set({'top':100});
         oImg.set('id', j);
         j++;
-            canvas.add(oImg);
-            console.log(oImg)
-            //canvas.on('object:added',{target:oImg});
+          canvas.add(oImg)
+          emitUpdate()
         });
 }
-socket.on('removeObj', function(o){
-  console.log(o+' deleted')
-    const canvasObject = getObjectFromCanvasById(o)
-    canvas.remove(canvasObject)
-});
-socket.on('bringToFront', function(o){
-  const canvasObject = getObjectFromCanvasById(o);
-  //console.log(canvasObject)
-  canvas.bringToFront(canvasObject);
-})
-socket.on('sendToBack', function(o){
-  const canvasObject = getObjectFromCanvasById(o);
-  //console.log(canvasObject)
-  canvas.sendToBack(canvasObject);
-})
-function getObjectFromCanvasById(id) {
-    const canvasObject = window.canvas.getObjects().filter((item) => {
-        return item.id === parseInt(id)
-    })
-    return canvasObject[0]
-}
-function indexes(){
-  var indexes = [];
-  var items = window.canvas.getObjects();
-  items.forEach(function(item){
-    //console.log(item.get('id')+'-->'+window.canvas.getObjects().indexOf(item))
-    indexes.push({
-                  id: item.get('id'),
-                  pos: window.canvas.getObjects().indexOf(item)
-                });
-  })
-  return indexes;
-  //console.log('a'+items)
-}
-
 </script>
-<h3 class="page-header" style = "margin-top:10px">&nbsp;Whiteboard <small>v1.3_beta</small></h3>
-<div style="float:left;z-index:1000">
-  <!--<button id="test">test</button>-->
 
-    <canvas id="myCanvas" width="955" height="500" style="border:1px dotted black; margin-left:10px">
+<nav class="navbar navbar-default" style="margin-bottom:5px">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <span class="navbar-brand" href="#">Whiteboard <small style="font-size:12px">v1.8_beta</small></span>
+    </div>
+     <ul class="nav navbar-nav">
+      <li><a href="#" style="font-size: 21px" id="save" data-toggle="tooltip" data-placement="bottom" title="Save&nbsp;image"><i class="fa fa-floppy-o"></i></a></li>
+      <li><a href="#" style="font-size: 21px" id="svg" class="svg" data-toggle="tooltip" data-placement="bottom" title="Save&nbsp;JSON"><img src="img/laptop-code.svg" style="width:21px; height:21px"/></a></li>
+      <li><a href="#"  style="font-size: 21px" id="clear" class="svg" data-toggle="tooltip" data-placement="bottom" title="Clear&nbsp;canvas"><img src="img/clean.svg" style="width:21px; height:21px"/></a></li>
+ <li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li>
+      <li><a href="#" style="font-size: 21px" id="removeMany" data-toggle="tooltip" data-placement="bottom" title="Delete"><i class="fa fa-trash-o"></i></a></li>
+      <li><a href="#" style="font-size: 21px" id="group" data-toggle="tooltip" data-placement="bottom" title="Group"><i class="fa fa-object-group"></i></a></li>
+      <li><a href="#" style="font-size: 21px" id="ungroup" data-toggle="tooltip" data-placement="bottom" title="Ungroup"><i class="fa fa-object-ungroup"></i></a></li>
+      <li><a href="#" style="font-size: 21px" id="forward" data-toggle="tooltip" data-placement="bottom" title="Bring&nbsp;Forward"><i class="fa fa-level-up"></i></a></li>
+      <li><a href="#" style="font-size: 21px" id="back" data-toggle="tooltip" data-placement="bottom" title="Send&nbsp;Back"><i class="fa fa-level-down"></i></a></li>
+
+<li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li>
+      <li><a href="#" style="font-size: 21px" id="noDraw" class="svg" data-toggle="tooltip" data-placement="bottom" title="Select&nbsp;Mode"><img src="img/select.svg" style="width:21px; height:21px"/></a></li>
+      <li><a href="#" style="font-size: 21px" id="draw" data-toggle="tooltip" data-placement="bottom" title="Pencil&nbsp;Mode"><i class="glyphicon glyphicon-pencil"></i></a></li>
+      <li><a href="#" style="font-size: 21px" id="paint" data-toggle="tooltip" data-placement="bottom" title="Brush&nbsp;Mode"><i class="fa fa-paint-brush"></i></a></li>
+      <li><a href="#" style="font-size: 21px" id="clone" class="svg" data-toggle="tooltip" data-placement="bottom" title="Duplicate"><img src="img/clone.svg" style="width:21px; height:21px"/></a></li>
+<li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li>
+      <li><a href="#" style="font-size: 21px" id="help" data-toggle="tooltip" data-placement="bottom" title="Help"><i class="fa fa-question"></i></a></li>
+    </ul>
+
+<!--     <ul class="nav navbar-nav navbar-right">
+      <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+      <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+    </ul> -->
+  </div>
+</nav>
+<div style="float:left;z-index:1000" id="viewport">
+
+    <canvas id="myCanvas" width="1355" height="520" style="border:1px dotted black; margin-left:5px;">
       <p>This is fallback content
       for users of assistive technologies
       or of browsers that don't have
       full support for the Canvas API.</p>
     </canvas>
 
-
   <div class="col-md-3" style="float:left;">
     <h5>Shapes</h5>
 
     <div class = "btn-group dropup">
          <button type = "button" class = "btn btn-default dropdown-toggle " data-toggle = "dropdown">
-            <i class="fa fa-star-o"></i> 
+            <!-- <i class="fa fa-star-o"></i> -->
+            <img src="img/shapes.svg" style="width: 23px; height:23px;" />
             <span class = "caret"></span>
          </button>
-       
-       <ul class = "dropdown-menu" role = "menu">
-          <button class="btn btn-default" id="rectangle"><i class="fa fa-square"></i></button>
-          <button class="btn btn-default" id="triangle"><i class="glyphicon glyphicon-triangle-top"></i></button>
-          <button class="btn btn-default" id="circle"><i class="fa fa-circle"></i></button>
-          <button class="btn btn-default" id="line"><i class="fa fa-arrows-h"></i></button>
-          <button class="btn btn-default" id="lineVertical"><i class="fa fa-arrows-v"></i></button>
+
+       <ul class = "dropdown-menu" role = "menu" style="text-align: center">
+        <li class="btn-group">
+          <button class="btn btn-default" style="font-size: 21px" id="rectangle"><i class="fa fa-square"></i></button>
+          <button class="btn btn-default" style="font-size: 21px; width:44px" id="triangle"><img src="img/triangle.svg" style="width: 18px; height:21px;"/></button>
+          <button class="btn btn-default" style="font-size: 21px" id="circle"><i class="fa fa-circle"></i></button>
+        </li>
+        <li class="btn-group">
+          <button class="btn btn-default" style="font-size: 21px" id="rectangleO"><i class="fa fa-square-o"></i></button>
+          <button class="btn btn-default" style="font-size: 21px; width:44px" id="triangleO"><img src="img/triangle-o.svg" style="width: 18px; height:21px;"/></button>
+          <button class="btn btn-default" style="font-size: 21px" id="circleO"><i class="fa fa-circle-thin"></i></button>
+        </li>
+        <li class="btn-group">
+          <!-- <button class="btn btn-default" style="font-size: 21px" id="line"><i class="fa fa-arrows-h"></i></button> -->
+          <!-- <button class="btn btn-default" style="font-size: 21px" id="lineVertical"><i class="fa fa-arrows-v"></i></button> -->
+          <button class="btn btn-default" style="font-size: 21px" id="line"><img src="img/substract.svg" style="width: 18px; height:21px;"/></button>
+          <button class="btn btn-default" style="font-size: 21px" id="lineVertical"><img src="img/icon.svg" style="width: 18px; height:21px;"/></button>
+          <button class="btn btn-default" style="font-size: 21px" id="lineDiag"><img src="img/diagonal-line.svg" style="width: 18px; height:21px;"/></button>
+        </li>
        </ul>
     </div>
     <div class = "btn-group dropup">
-         <button type = "button" class = "btn btn-default dropdown-toggle " data-toggle = "dropdown">
-            <i class="fa fa-building-o"></i> 
+         <button type = "button" class = "btn btn-default dropdown-toggle" data-toggle = "dropdown">
+            <img src="img/shapes2.svg" style="width: 23px; height:23px;" />
             <span class = "caret"></span>
          </button>
-       
-       <ul class = "dropdown-menu" role = "menu">
-          <button class="btn btn-default" id="addServer"><i class="glyphicon glyphicon-hdd"></i></button>
-          <button class="btn btn-default" id="addServers"><i class="fa fa-server"></i></button>
-          <button class="btn btn-default" id="addPC"><i class="fa fa-laptop"></i></button>
-          <button class="btn btn-default" id="addLib"><i class="fa fa-film"></i></button>
-          <button class="btn btn-default" id="addDb"><i class="fa fa-database"></i></button>
+
+       <ul class = "dropdown-menu" role = "menu" style="text-align: center">
+         <li class="btn-group">
+          <button class="btn btn-default" style="font-size: 21px" id="addServer"><i class="glyphicon glyphicon-hdd"></i></button>
+          <button class="btn btn-default" style="font-size: 21px" id="addServers"><i class="fa fa-server"></i></button>
+          <button class="btn btn-default" style="font-size: 21px; width: 46px" id="addPC"><i class="fa fa-laptop"></i></button>
+        </li>
+        <li class="btn-group">
+          <button class="btn btn-default" style="font-size: 21px" id="addLib"><img style="width: 21px; height:21px" src="img/library2.svg"/></button>
+          <button class="btn btn-default" style="font-size: 21px; width: 47px" id="addDb"><i class="fa fa-database"></i></button>
+          <button class="btn btn-default" style="font-size: 21px; width: 46px" id="addArrow"><i class="fa fa-arrow-right"></i></button>
+        </li>
+        <li class="btn-group">
+          <button class="btn btn-default" style="font-size: 21px" id="addFtp"><img style="width: 21px; height:21px;" src="img/antenna.svg"/></button>
+          <button class="btn btn-default" style="font-size: 21px" id="addUnc"><img style="width: 21px; height:21px;" src="img/network.svg"/></i></button>
+          <button class="btn btn-default" style="font-size: 21px" id="addArrows"><i class="fa fa-exchange fa-rotate-90"></i></button>
+        </li>
+        <li class="btn-group">
+          <button class="btn btn-default" style="font-size: 21px" id="addLib2"><img style="width: 21px; height:21px;" src="img/library.svg"/></button>
+          <button class="btn btn-default" style="font-size: 21px" id="addPC2"><img style="width: 21px; height:21px;" src="img/server2.svg"/></i></button>
+          <button class="btn btn-default" style="font-size: 21px" id="addCache"><img style="width: 21px; height:21px;" src="img/database-alt1.svg"/></i></button>
+        </li>
+        <li>
+          <button class="btn btn-default" style="font-size: 21px" id="addNews"><img style="width: 21px; height:21px;" src="img/news.svg"/></i></button>
+        </li>
        </ul>
     </div>
-
-
 
   </div>
   <div class="col-md-3" style="float:left, text-align: center;">
@@ -490,12 +200,13 @@ function indexes(){
   <div class="col-md-6.5" style="display:inline">
     <h5>Text</h5>
       <input type="text" class="form-control" id="label" placeholder="Insert text here" style="width:175px; float:left">
-      <button class="btn btn-default" id="addText"><i class="fa fa-text-width"></i></button>
-      <button class="btn btn-default" id="textBold"><i class="fa fa-bold"></i></button>
-      <button class="btn btn-default" id="textItalic"><i class="fa fa-italic"></i></button>
-      <button class="btn btn-default" id="textUnderline"><i class="fa fa-underline"></i></button>
-      <button class="btn btn-default" id="textStrike"><i class="fa fa-strikethrough"></i></button>
-      <!-- <div> -->
+      <button class="btn btn-default" id="addText"><img src="img/text.svg" style="width:19px; height:19px"/></button>
+      <div class="btn-group">
+        <button class="btn btn-default" id="textBold"><i class="fa fa-bold"></i></button>
+        <button class="btn btn-default" id="textItalic"><i class="fa fa-italic"></i></button>
+        <button class="btn btn-default" id="textUnderline"><i class="fa fa-underline"></i></button>
+        <button class="btn btn-default" id="textStrike"><i class="fa fa-strikethrough"></i></button>
+      </div>
         <input type="hidden" value="times" id="textFont"/>
         <input type="hidden" value="20" id="textSize"/>
         <div class="btn-group">
@@ -518,42 +229,72 @@ function indexes(){
               <li class="size" id="44"><a href="#">44 px</a></li>
             </ul>
           </button>
-        <!-- </div> -->
         </div>
   </div>
   <div class="clearfix"></div>
 </div>
-<div class="col-md-3" style="text-align:left!important" style="width:24%">
-  <div style="overflow:none; z-index:-10">
-    <h5>Mode</h5>
-      <button class="btn btn-default" id="noDraw"><i class="fa fa-arrows"></i></button>
-      <button class="btn btn-default" id="draw"><i class="glyphicon glyphicon-pencil"></i></button>
-      <button class="btn btn-default" id="paint"><i class="fa fa-paint-brush"></i></button>
-      
-  </div>
-  <!-- <button id="remove">remove</button> -->
-  <div>
-    <h5>Edit</h5>
-      <button class="btn btn-default" id="removeMany"><i class="fa fa-trash-o"></i></button>
-      <button class="btn btn-default" id="group" disabled><i class="fa fa-object-group"></i></button>
-      <button class="btn btn-default" id="ungroup" disabled><i class="fa fa-object-ungroup"></i></button>
-      <button class="btn btn-default" id="forward"><i class="fa fa-level-up"></i></button>
-      <button class="btn btn-default" id="back"><i class="fa fa-level-down"></i></button>
-
-  </div>
-  <div>
-    <h5>File</h5>
-      <button class="btn btn-default" id="save"><i class="fa fa-floppy-o"></i></button>
-      <button class="btn btn-default" id="clear"><i class="fa fa-clone"></i></button>
-      <button class="btn btn-default" id="svg"><i class="fa fa-code"></i></button>
-      <button class="btn btn-default" id="help"><i class="fa fa-question"></i></button>
-  </div>
 </div>
+<div id="helpPage" class="carousel slide" data-ride="carousel" data-interval="false" style="display: none; width:1300px;height:540px; z-index:9999; margin:0 auto; text-align:center!important">
+  <!-- Indicators -->
 
+  <!-- Wrapper for slides -->
+  <div class="carousel-inner" style="">
+    <div class="item active">
+      <img src="help/shapes.png" alt="Los Angeles" class="center-block" style="height:508px">
+
+    </div>
+
+    <div class="item">
+      <img src="help/buttons.png" alt="Chicago" class="center-block" style="height:508px">
+    </div>
+  </div>
+
+  <!-- Left and right controls -->
+  <a class="left carousel-control" href="#helpPage" data-slide="prev">
+    <span class="glyphicon glyphicon-chevron-left"></span>
+    <span class="sr-only">Previous</span>
+  </a>
+  <a class="right carousel-control" href="#helpPage" data-slide="next">
+    <span class="glyphicon glyphicon-chevron-right"></span>
+    <span class="sr-only">Next</span>
+  </a>
+<button class="btn btn-default" id="closeHelp">Close Help</button>
+</div>
   <div class="panel-group" id="accordion" style="position: fixed; bottom:0;left:0; width:100%;padding:0; margin:0">
     <div class="panel panel-default">
       <div id="collapse1" class="panel-collapse collapse out">
         <div class="panel-body" style="max-height: 450px; overflow-y:scroll">
+          <p>
+            <u>May 2-3, 2017 - v1.6_beta</u>
+            <ul>
+              <li> Clone multiple objects at the same time</li>
+              <li> Added help</li>
+              <li> Changed layout again, added dtop navbar, moved File, Edit and Move groups to top and hid the headers. Moved the buttons slightly</li>
+              <li> Slightly increased the canvas height and greatly increased the width</li>
+            </ul>
+          </p>
+          <p>
+            <u>May 1, 2017 - v1.6_beta</u>
+            <ul>
+              <li> Changed icons for simple and advanced shapes</li>
+              <li> Added simple shapes (transparent triangle, rectange, circle (fabric); vertical, horizontal, diagonal line (svg); removed old lines(fabric))</li>
+              <li> Added News advanced shape</li>
+              <li> Added support for changing svg color</li>
+              <li> Added cloning</li>
+              <li> Grouped in button-group: basic and advanced shapes, text options, mode, file, edit buttons, changed several icons</li>
+            </ul>
+          </p>
+          <p>
+            <u>Apr 29 - 30, 2017 - v1.5_beta </u>
+            <ul>
+              <li> Changed drawing algorithm, added JSON emit</li>
+              <li> Added more advanced shapes and changed all to svgs</li>
+              <li> Fixed issues with multiple images on canvas and moving multiple shapes </li>
+              <li> Re-enabled group and ungroup functions</li>
+              <li> Code refactoring and cleanup (added 145 lines, removed 552)</li>
+            </ul>
+          </p>
+          <p>
           <p>
             <u>Apr 28, 2017 - v1.3_beta</u>
             <ul>
@@ -597,7 +338,6 @@ function indexes(){
               </li>
             </ul>
           </p>
-
         </div>
       </div>
       <div class="panel-footer" style="height:15px; padding:0; margin:0">
@@ -608,14 +348,44 @@ function indexes(){
     </div>
   <script type="text/javascript">
   // Store the canvas object into a variable
-
    var canvas  = document.getElementById('myCanvas');
    var context = canvas.getContext('2d');
-var strokeWidth = 1;
+   var strokeWidth = 1;
+$(document).ready(function(){
+  $('[data-toggle="tooltip"]').tooltip({'delay': { show: 1000, hide: 150 }});
+  $(".svg").each(function(){
+        var $img = jQuery(this).find('img');
+        var imgURL = $img.attr('src');
+        jQuery.get(imgURL, function(data) {
+            var $svg = jQuery(data).find('svg');
+            $svg.attr('width', 21)
+            $svg.attr('height', 21)
+            $svg.attr('fill', '#777')
+            $svg.attr('class', 'svg')
+            // Replace image with new SVG
+            $img.replaceWith($svg);
+        }, 'xml');   
+  })
+})
+$("body").on('mouseout',".svg", function(){
+        var $img = jQuery(this).find('svg');
+            $svg=$img;
+            $svg.attr('fill', '#777')
+            $img.replaceWith($svg);  
+})
+$("body").on('mouseover',".svg", function(){
+        var $img = jQuery(this).find('svg');
 
+            $svg=$img;
+            $svg.attr('fill', 'black')
+            $img.replaceWith($svg);  
+})
 $(".font").on('click', function(){
   var id = $(this).attr('id');
   $('#textFont').val(id);
+})
+$("#svg").on('click', function(){
+  emitUpdate()
 })
 $(".size").on('click', function(){
   var id = $(this).attr('id');
@@ -642,9 +412,16 @@ $('#paint').on('click', function(){
 $('#fill').on('click', function(){
   var o = canvas.getActiveObject();
   var fill = $("#selectColor").val();
-  o.setFill (fill);
-  canvas.renderAll();
-  canvas.trigger('object:modified', {target: o});
+  if(o.type!=='image'){
+    o.setFill (fill);
+    canvas.renderAll();
+    canvas.trigger('object:modified', {target: o});
+  }else{
+      o.filters.push(new fabric.Image.filters.Tint({
+                color: fill,
+            }));
+            o.applyFilters(canvas.renderAll.bind(canvas));
+  }
 })
 $('#outline').on('click', function(){
   var o = canvas.getActiveObject();
@@ -672,22 +449,22 @@ $('#clear').on('click', function(){
   j=0;
 })
 $("#forward").on('click', function(){
-  var activeObject = canvas.getActiveObject(),
-      activeGroup = canvas.getActiveGroup();
-// canvas.sendBackwards(myObject)
-// canvas.sendToBack(myObject)
-// canvas.bringForward(myObject)
-canvas.bringToFront(activeObject)
-socket.emit('bringToFront',canvas.getActiveObject().id)
+    var activeObject = canvas.getActiveObject(),
+        activeGroup = canvas.getActiveGroup();
+  // canvas.sendBackwards(myObject)
+  // canvas.sendToBack(myObject)
+  // canvas.bringForward(myObject)
+  canvas.bringToFront(activeObject)
+  emitUpdate()
 })
 $("#back").on('click', function(){
-  var activeObject = canvas.getActiveObject(),
-      activeGroup = canvas.getActiveGroup();
-// canvas.sendBackwards(myObject)
-canvas.sendToBack(activeObject)
-socket.emit('sendToBack',canvas.getActiveObject().id)
-// canvas.bringForward(myObject)
-//canvas.bringToFront(activeObject)
+    var activeObject = canvas.getActiveObject(),
+        activeGroup = canvas.getActiveGroup();
+  // canvas.sendBackwards(myObject)
+  canvas.sendToBack(activeObject)
+  emitUpdate()
+  // canvas.bringForward(myObject)
+  //canvas.bringToFront(activeObject)
 })
 $("#save").on('click', function(){
   var save = document.getElementById("myCanvas"), ctx = canvas.getContext("2d");
@@ -706,11 +483,16 @@ $('#group').on('click', function(){
           canvas.remove(object);
       });
       canvas.add(newgroup);
+emitUpdate()
   });
 });
 $("#ungroup").click(function(){
    var activeObject = canvas.getActiveObject();
-    if(activeObject.type=="group"){
+   ungroup(activeObject)
+
+});
+function ungroup(activeObject){
+  if(activeObject.type=="group"){
         var items = activeObject._objects;
         //alert(items);
         activeObject._restoreObjectsState();
@@ -720,141 +502,122 @@ $("#ungroup").click(function(){
           canvas.item(canvas.size()-1).hasControls = true;
         }
         canvas.renderAll();
+  emitUpdate()
     }
-});
-
+}
 $('#removeMany').on('click', function(){
 if(canvas.getActiveGroup()){
-      canvas.getActiveGroup().forEachObject(function(o){ canvas.remove(o);socket.emit('removeObject', o.id) });
+      canvas.getActiveGroup().forEachObject(function(o){ canvas.remove(o); });
 
       canvas.discardActiveGroup().renderAll();
     } else {
       var o=canvas.getActiveObject();
       canvas.remove(canvas.getActiveObject());
-      socket.emit('removeObject', o.id)
     }
+emitUpdate()
 })
-
+$("#clone").on('click', function(){
+  var group;
+  var object;
+  if(canvas.getActiveObject()){
+    var copyData = canvas.getActiveObject().toObject();
+    group=false;
+  }
+  if(canvas.getActiveGroup()){
+    var copyData = canvas.getActiveGroup().toObject();
+    group=true;
+  }
+  canvas.deactivateAll().renderAll();
+  fabric.util.enlivenObjects([copyData], function(objects) {
+    objects.forEach(function(o) {
+      o.set("id", j);
+      j++;
+      o.set('top', o.top + 15);
+      o.set('left', o.left + 15);
+      canvas.add(o);
+      object=o;
+      emitUpdate()
+    });
+    if(group) ungroup(object)
+})
+emitUpdate()
+})
 $("#rectangle").on('click', function(e) {
-  //e.preventDefault();
   var color = $("#selectColor").val();
   var stroke = $("#selectColor2").val();
   rectangle(color,stroke,125,75,100,100);
-  //socket.emit('rect', color, 125,75,100,100)
 })
-$("#line").on('click', function(e) {
-  //e.preventDefault();
-  var color = $("#selectColor").val();
-  rectangle(color,color, 125,3,100,100);
-  //socket.emit('rect', color, 125,75,100,100)
+$("#rectangleO").on('click', function(e) {
+  var color = '';
+  var stroke = $("#selectColor2").val();
+  rectangle(color,stroke,125,75,100,100);
 })
 $("#triangle").on('click', function(e) {
-  //e.preventDefault();
   var color = $("#selectColor").val();
   var stroke = $("#selectColor2").val();
   triangle(color, stroke);
-  //socket.emit('rect', color, 125,75,100,100)
+})
+$("#triangleO").on('click', function(e) {
+  var color = '';
+  var stroke = $("#selectColor2").val();
+  triangle(color, stroke);
 })
 $("#circle").on('click', function(e) {
-  //e.preventDefault();
   var stroke = $("#selectColor2").val();
   var color = $("#selectColor").val();
   circle(color, stroke);
-  //socket.emit('rect', color, 125,75,100,100)
 })
-$("#lineVertical").on('click', function(e) {
-  //e.preventDefault();
-  var color = $("#selectColor").val();
-  rectangle(color,color, 3,125,100,100);
-  //socket.emit('rect', color, 125,75,100,100)
+$("#circleO").on('click', function(e) {
+  var stroke = $("#selectColor2").val();
+  var color = '';
+  circle(color, stroke);
 })
-$("#addServer").on('click', function(e) {
-  addImg(serverImg);
-})
-$("#addServers").on('click', function(e) {
-  addImg(serversImg);
-})
-$("#addLib").on('click', function(e) {
-  addImg(libImg);
-})
-$("#addPC").on('click', function(e) {
-  addImg(pcImg);
-})
-$("#addDb").on('click', function(e) {
-  addImg(dbImg);
-})
+
+$("#addServer").on('click', function(e) { addImg(serverImg);  })
+$("#addServers").on('click', function(e) {  addImg(serversImg); })
+$("#addLib").on('click', function(e) {  addImg(libImg); })
+$("#addPC").on('click', function(e) { addImg(pcImg);  })
+$("#addDb").on('click', function(e) { addImg(dbImg);  })
+$("#addArrow").on('click', function(e) {  addImg(arrow);  })
+$("#addArrows").on('click', function(e) {  addImg(arrows); })
+$("#addCache").on('click', function(e) {  addImg(cache);  })
+$("#addFtp").on('click', function(e) {  addImg(ftp);  })
+$("#addUnc").on('click', function(e) {  addImg(unc);  })
+$("#addPC2").on('click', function(e) {  addImg(pcImg2); })
+$("#addLib2").on('click', function(e) {  addImg(libImg2);  })
+$("#line").on('click', function(e) {  addImg(lineH);  })
+$("#addNews").on('click', function(e) {  addImg(news);  })
+$("#lineVertical").on('click', function(e) {  addImg(lineV);  })
+$("#lineDiag").on('click', function(e) {  addImg(lineD);  })
+
 // create a wrapper around native canvas element (with id="c")
 var canvas = new fabric.Canvas('myCanvas', {preserveObjectStacking: false});
-
- canvas.on('object:modified', function(options){
-            console.info("object modified",options)
-            //canvas.deactivateAllWithDispatch()//deselect all objects
-            
-            var index = indexes();
-            //console.log(objects)
-           // if(options.target.type!='path'){
-              socket.emit('send_redraw', {id:options.target.id,object:options.target, index:index});
-            //}
-
-    },false);
-
-canvas.on('path:created', function(event) {
-    //log the svg path  info
-   console.log(event.path);
-   //socket.emit('canvas', event.path.path, event.path.left, event.path.top);
-   //event.path.id = fabric.Object.__uid++;
-   //event.path.setStroke('red')
-   event.path.id = j;
-   j++;
-   //socket.emit('pathadded', event.path);
-   socket.emit('objAddOnce', event.path.id,event.path);
-})
-canvas.on('object:modified', function(event) {
-    //var modifiedObject = event.target;
-    //console.log(modifiedObject.get('left'), modifiedObject.get('top'));
+canvas.on('object:modified', function(){
+  emitUpdate()
+},false);
+modified = false;
+canvas.on('path:created', function() {
+  emitUpdate()
 })
 canvas.on('object:added', function(options) {
-          socket.emit('objAddOnce', options.target.id,options.target);
+//do nothing
 }, false)
-
 // create a rectangle object
 function rectangle(color,stroke, width, height, left, top){
   var rect = new fabric.Rect({
-    id: j,
-    left: left,
-    top: top,
-    fill: color,
-    stroke: stroke,
-    width: width,
-    height: height
+    id: j,left: left,top: top,fill: color,stroke: stroke,width: width,height: height
   });
   canvas.add(rect);
-  j++;
+emitUpdate()
 }
-function text(label, color, stroke){
+function text(label, fill, stroke){
   var font = $("#textFont").val();
-  var size = $("#textSize").val();
+  var fontSize = $("#textSize").val();
 
-  if($("#textBold").hasClass('active')){
-    fontWeight = 'bold';
-  }else{
-    fontWeight ='normal';
-  }
-  if($("#textItalic").hasClass('active')){
-    fontStyle = 'italic';
-  }else{
-    fontStyle ='normal';
-  }
-    if($("#textUnderline").hasClass('active')){
-    textDecoration1 = 'underline';
-  }else{
-    textDecoration1 ='';
-  }
-    if($("#textStrike").hasClass('active')){
-    textDecoration2 = 'line-through';
-  }else{
-    textDecoration2 ='';
-  }
+  var fontWeight = ($("#textBold").hasClass('active') ? 'bold' : 'normal');
+  var fontStyle = ($("#textItalic").hasClass('active') ? 'italic' : 'normal');
+  var textDecoration1 = ($("#textUnderline").hasClass('active') ? 'underline' : '');
+  var textDecoration2 = ($("#textStrike").hasClass('active') ? 'line-through' : '');
 
 if(textDecoration1!='' && textDecoration2 !=''){
   textDecoration = textDecoration1+','+textDecoration2;
@@ -865,56 +628,45 @@ if(textDecoration1!='' && textDecoration2 !=''){
     textDecoration = textDecoration1;
   }
 }
-
-  if(font=='times'){
-    fontFamily = 'Times New Roman, Times, serif';
+  switch (font) {
+    case 'times': fontFamily = 'Times New Roman, Times, serif'; break;
+    case 'arial': fontFamily = 'Arial, Helvetica, sans-serif'; break;
+    case 'verdana': fontFamily = 'Verdana,Geneva,sans-serif'; break;
+    case 'comic': fontFamily = '"Comic Sans MS", cursive, sans-serif'; break;
+    case 'courier': fontFamily = '"Courier New", Courier, monospace'; break;
   }
-  if(font=='arial'){
-    fontFamily = 'Arial, Helvetica, sans-serif';
-  }
-  if(font=='verdana'){
-    fontFamily = 'Verdana,Geneva,sans-serif';
-  }
-  if(font=='comic'){
-    fontFamily = '"Comic Sans MS", cursive, sans-serif';
-  }
-  if(font=='courier'){
-    fontFamily = '"Courier New", Courier, monospace';
-  }
-
   var text = new fabric.Text(label, {
-  id: j,
-  fontFamily: fontFamily,
-  fontWeight: fontWeight,
-  fontStyle: fontStyle,
-  textDecoration: textDecoration,
-  fontSize: size,
-  fill: color,
-  stroke: stroke,
-  originX: 'center',
-  originY: 'center',
-  left: 100,
-  top: 100,
-});
+    id: j,fontFamily,fontWeight,fontStyle,textDecoration,fontSize,fill,stroke,originX: 'center',originY: 'center',left: 100,top: 100,
+  });
   canvas.add(text)
-  j++;
+emitUpdate()
 }
-function circle(color, stroke){
+function circle(fill, stroke){
   var circle = new fabric.Circle({
-    id:j,
-  radius: 30, fill: color, left: 100, top: 100, stroke:stroke
-});
+    id:j,radius: 30, fill, left: 100, top: 100, stroke
+  });
   canvas.add(circle)
-  j++;
+emitUpdate()
 }
-function triangle(color, stroke){
+function triangle(fill, stroke){
   var triangle = new fabric.Triangle({
-  id:j,
-  width: 50, height: 50, fill: color, left: 50, top: 50, stroke:stroke
-});
+    id:j,width: 50, height: 50, fill, left: 50, top: 50, stroke
+  });
   canvas.add(triangle)
-  j++;
+emitUpdate()
 }
-
-
-  </script>
+function emitUpdate(){
+  j++;
+  modified=true;
+  var json = JSON.stringify(canvas);
+  socket.emit('update', json, j);
+}
+$("#help").on('click', function(){
+  $("#viewport").hide();
+  $('#helpPage').show();
+})
+$("#closeHelp").on('click', function(){
+  $("#viewport").show();
+  $('#helpPage').hide();
+})
+</script>
