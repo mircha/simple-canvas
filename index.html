@@ -1,24 +1,25 @@
-<script
-  src="https://code.jquery.com/jquery-3.2.1.min.js"
-  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-  crossorigin="anonymous"></script>
-<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jcanvas/16.7.3/jcanvas.js"></script>-->
-<script type="text/javascript" src="js/FileSaver.min.js"></script>
+<script src="js/jquery-3.2.1.min.js"></script>
+<script type="text/javascript" src="js/fabric1.7.11.min.js"></script>
 <script src="js/jscolor.min.js"></script>
+<script type="text/javascript" src="js/FileSaver.min.js"></script>
+<link rel="stylesheet" href="css/range.css">
 <!--<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.9/fabric.min.js"></script>-->
-<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.11/fabric.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script><!--socketIO-->
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script><!--socketIO-->
+<script src="js/bootstrap.min.js"></script>
 
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/drawFunctions.js"></script>
+<script type="text/javascript" src="js/textFunctions.js"></script>
+<script type="text/javascript" src="js/canvasOperations.js"></script>
+<script type="text/javascript" src="js/colorPick.js"></script>
+<script type="text/javascript" src="js/topmenu.js"></script>
 
 <script type="text/javascript">
 var socketid='';
-
 //var socket = io('http://192.168.0.114:3000');
 var socket = io('http://127.0.0.1:3000');
 var j=0;
@@ -65,29 +66,13 @@ socket.on('resFiles', function(sql){
     }
     list+='</ul>';
     $("#sqlFiles").html(list);
-  })
-function addImg(myImg){
-    fabric.Image.fromURL(myImg, function(oImg) {
-        oImg.set('id', parseInt(j));
-        oImg.scale(0.3);
-
-        if(myImg=='img/server2.svg' || myImg=='img/laptop.svg' || myImg=='img/news.svg'){
-
-          oImg.scale(0.7);
-         }
-        oImg.set({'left':100});
-        oImg.set({'top':100});
-        oImg.set('id', j);
-        j++;
-          canvas.add(oImg)
-          emitUpdate()
-        });
-}
+})
 </script>
+
 <!DOCTYPE html>
 <html>
 <head>
-<title>Whiteboard</title>
+  <title>Whiteboard</title>
 </head>
 <body>
 <div id="content">
@@ -107,11 +92,7 @@ function addImg(myImg){
       <li><a href="#" style="font-size: 21px" id="ungroup" data-toggle="tooltip" data-placement="bottom" title="Ungroup"><i class="fa fa-object-ungroup"></i></a></li>
       <li><a href="#" style="font-size: 21px" id="forward" data-toggle="tooltip" data-placement="bottom" title="Bring&nbsp;Forward"><i class="fa fa-level-up"></i></a></li>
       <li><a href="#" style="font-size: 21px" id="back" data-toggle="tooltip" data-placement="bottom" title="Send&nbsp;Back"><i class="fa fa-level-down"></i></a></li>
-
   <li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li>
-      <li><a href="#" style="font-size: 21px" id="noDraw" class="svg" data-toggle="tooltip" data-placement="bottom" title="Select&nbsp;Mode"><img src="img/select.svg" style="width:21px; height:21px"/></a></li>
-      <li><a href="#" style="font-size: 21px" id="draw" data-toggle="tooltip" data-placement="bottom" title="Pencil&nbsp;Mode"><i class="glyphicon glyphicon-pencil"></i></a></li>
-      <li><a href="#" style="font-size: 21px" id="paint" data-toggle="tooltip" data-placement="bottom" title="Brush&nbsp;Mode"><i class="fa fa-paint-brush"></i></a></li>
       <li><a href="#" style="font-size: 21px" id="clone" class="svg" data-toggle="tooltip" data-placement="bottom" title="Duplicate"><img src="img/clone.svg" style="width:21px; height:21px"/></a></li>
   <li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li>
       <li><a href="#" style="font-size: 21px" id="help" data-toggle="tooltip" data-placement="bottom" title="Help"><i class="fa fa-question"></i></a></li>
@@ -134,7 +115,6 @@ function addImg(myImg){
 
   <div class="col-md-3" style="float:left;">
     <h5>Shapes</h5>
-
     <div class = "btn-group dropup">
          <button type = "button" class = "btn btn-default dropdown-toggle " data-toggle = "dropdown">
             <img src="img/shapes.svg" style="width: 23px; height:23px;" />
@@ -190,6 +170,27 @@ function addImg(myImg){
         </li>
        </ul>
     </div>
+      <div class = "btn-group dropup">
+         <button type = "button" class = "btn btn-default dropdown-toggle" data-toggle = "dropdown">
+            <img src="img/sketch.svg" style="width: 23px; height:23px;" />
+            <span class = "caret"></span>
+         </button>
+            <ul class = "dropdown-menu" role = "menu" style="text-align: center">
+             <li class="btn-group">
+              <button class="btn btn-default" style="font-size: 21px" id="draw"><i class="glyphicon glyphicon-pencil"></i></button>
+              <button class="btn btn-default" style="font-size: 21px" id="paint"><i class="fa fa-paint-brush"></i></button>
+            </li>
+              <li class="btn-group">
+                <input id="strokeSelect" type="range" min="4" max="99" step="1" value="15" style="width:80px; float:left; height:10px; padding-right:3px" />
+                <input id="strokeSize" type="text" style="width:45px" class="form-control" value="15">
+              </li>
+          </ul>
+      </div>
+      <div class = "btn-group dropup">
+         <button id="noDraw" type = "button" class = "btn btn-default">
+            <img src="img/select.svg" style="width: 23px; height:23px;" />
+         </button>
+      </div>
 </div>
   <div class="col-md-3" style="float:left, text-align: center;">
     <h5>Color Picker</h5>
@@ -203,8 +204,8 @@ function addImg(myImg){
           style="width:35px; height:20px;"></button>
       <input id="selectColor2" value="FFFFFF" style="display:none">
       <input id="selectColor" value="FFFFFF" style="display:none">
-      <button class="btn btn-default" id="fill"><i class="fa fa-tint"></i></button>
-      <button class="btn btn-default" id="outline"><i class="fa fa-square-o"></i></button>
+      <button class="btn btn-default" id="fill" class="svg2"><img src="img/fill.svg" style="width: 23px; height:23px;" /></button>
+      <button class="btn btn-default" id="outline"><img src="img/border.svg" style="width: 23px; height:23px;" /></button>
   </div>
 <style type="text/css">
   .btn-group.btn {   border: 0;   padding: 0; }
@@ -212,7 +213,7 @@ function addImg(myImg){
   <div class="col-md-6.5" style="display:inline">
     <h5>Text</h5>
       <input type="text" class="form-control" id="label" placeholder="Insert text here" style="width:175px; float:left">
-      <button class="btn btn-default" id="addText"><img src="img/text.svg" style="width:19px; height:19px"/></button>
+      <button class="btn btn-default" id="addText" disabled><img src="img/text.svg" style="width:19px; height:19px"/></button>
       <div class="btn-group">
         <button class="btn btn-default" id="textBold"><i class="fa fa-bold"></i></button>
         <button class="btn btn-default" id="textItalic"><i class="fa fa-italic"></i></button>
@@ -221,8 +222,7 @@ function addImg(myImg){
       </div>
     </div>
         <input type="hidden" value="times" id="textFont"/>
-        <input type="hidden" value="20" id="textSize"/>
-        <div class="btn-group">
+        <div class="btn-group" id="fontandsize">
           <button class="btn btn-default btn-group btn-sm dropup">
             <a class="btn btn-default dropdown-toggle btn-sm" data-toggle="dropdown" href="#"><i class="glyphicon glyphicon-font"></i> <span class="caret"></span></a>
             <ul class="dropdown-menu" id="fontSelect">
@@ -235,11 +235,11 @@ function addImg(myImg){
           </button>
           <button class="btn btn-default btn-group btn-sm dropup">
             <a class="btn btn-default dropdown-toggle btn-sm" data-toggle="dropdown" href="#"><i class="glyphicon glyphicon-text-size"></i> <span class="caret"></span></a>
-            <ul class="dropdown-menu">
-              <li class="size" id="20"><a href="#">20 px</a></li>
-              <li class="size" id="28"><a href="#">28 px</a></li>
-              <li class="size" id="36"><a href="#">36 px</a></li>
-              <li class="size" id="44"><a href="#">44 px</a></li>
+            <ul ul class = "dropdown-menu" role = "menu" style="text-align: center">
+            <li class="btn-group">
+                <input id="textSizeSelect" type="range" min="4" max="99" step="1" value="20" style="width:80px; float:left; height:10px; padding-right:3px" />
+                <input id="textSize" type="text" style="width:45px" class="form-control" value="20">
+            </li>
             </ul>
           </button>
         </div>
@@ -274,91 +274,8 @@ function addImg(myImg){
 <div class="panel-group" id="accordion" style="position: fixed; bottom:0;left:0; width:100%;padding:0; margin:0">
     <div class="panel panel-default">
       <div id="collapse1" class="panel-collapse collapse out">
-        <div class="panel-body" style="max-height: 450px; overflow-y:scroll">
-          <p>
-            <u>May 4, 2017 - v1.9_beta</u>
-            <ul>
-              <li> Code cleanup due to mistake when downloading from GitHub</li>
-              <li> Enabled Save To JSON (from ./json folder)</li>
-              <li> Added load from JSON (from ./json folder)</li>
-              <li> Added name check for save to JSON (no overwriting)</li>
-              <li> Modified Save to image - split into save to PNG and save to SVG</li>
-              <li> Can add name when saving to png/svg</li>
-            </ul>
-          </p>
-          <p>
-            <u>May 2-3, 2017 - v1.8_beta</u>
-            <ul>
-              <li> Clone multiple objects at the same time</li>
-              <li> Added help</li>
-              <li> Changed layout again, added dtop navbar, moved File, Edit and Move groups to top and hid the headers. Moved the buttons slightly</li>
-              <li> Slightly increased the canvas height and greatly increased the width</li>
-            </ul>
-          </p>
-          <p>
-            <u>May 1, 2017 - v1.6_beta</u>
-            <ul>
-              <li> Changed icons for simple and advanced shapes</li>
-              <li> Added simple shapes (transparent triangle, rectange, circle (fabric); vertical, horizontal, diagonal line (svg); removed old lines(fabric))</li>
-              <li> Added News advanced shape</li>
-              <li> Added support for changing svg color</li>
-              <li> Added cloning</li>
-              <li> Grouped in button-group: basic and advanced shapes, text options, mode, file, edit buttons, changed several icons</li>
-            </ul>
-          </p>
-          <p>
-            <u>Apr 29 - 30, 2017 - v1.5_beta </u>
-            <ul>
-              <li> Changed drawing algorithm, added JSON emit</li>
-              <li> Added more advanced shapes and changed all to svgs</li>
-              <li> Fixed issues with multiple images on canvas and moving multiple shapes </li>
-              <li> Re-enabled group and ungroup functions</li>
-              <li> Code refactoring and cleanup (added 145 lines, removed 552)</li>
-            </ul>
-          </p>
-          <p>
-            <u>Apr 28, 2017 - v1.3_beta</u>
-            <ul>
-              <li> Layout change - grouped basic shapes and renamed Basic Shapes into Shapes</li>
-              <li> Layout change - added server, servers, library, database and pc buttons and grouped them in Advanced Shapes under Shapes</li>
-              <li> Fixed Add image on canvas</li>
-            </ul>
-          </p>
-          <p>
-            <u>Apr 26, 2017 - v1.2_beta</u>
-            <ul>
-              <li> Layout change - grouped buttons and split the GUI in bottom and right sections</li>
-              <li> Added text options: bold, italic, underline, striketrough, font size and font family</li>
-              <li> Created the Version changes footer</li>
-              <li> Added painbrush option</li>
-              <li> Added fill inside path (also works as change color for shapes)</li>
-              <li> Added change outline color (also works as change line color)</li>
-              <li> Add image on canvas (not working properly)</li>
-            </ul>
-          </p>
-          <p>
-            <u>Apr 25, 2017 - v1.1_beta</u>
-            <ul>
-              <li> Fixed issues with whiteboard not keeping object stack</li>
-              <li> Free draw can be moved now and deleted</li>
-              <li> Added send to back, and integrated bring to front and send to back with socket.io</li>
-            </ul>
-          </p>
-          <p>
-            <u>Apr 14, 2017 - v1</u>
-            <ul>
-              <li> Integration with socket.io - interactivity and bootstrap integration - GUI</li>
-              <li> Added clear canvas, basic shapes - lines, color picker for background and outline</li>
-              <li> Disabled group and ungroup</li>
-            </ul>
-          </p>
-          <p>
-            <u>Apr 13, 2017 - v0</u>
-            <ul>
-              <li> Initial commit, made the whiteboard and added functionality for basic shapes (rectangle, triangle, circle), also added text and free draw, save file, grouping and bring to front
-              </li>
-            </ul>
-          </p>
+        <div class="panel-body" style="max-height: 450px; overflow-y:scroll" id="changelog">
+          <!-- changelog.html is loaded here -->
         </div>
       </div>
       <div class="panel-footer" style="height:15px; padding:0; margin:0">
@@ -410,7 +327,7 @@ function addImg(myImg){
       </div>
 <!-- Save JSON modal -->
 <!-- Save PNG/SVG modal -->
-      <div id="savePNGorSVG" class="modal fade" role="dialog" style="z-index:99999; text-align:center; width:100%">
+      <div id="savePNGorSVG" class="modal fade" role="dialog" style="z-index:5000; text-align:center; width:100%">
         <div class="modal-dialog">
           <!-- Modal content-->
           <div class="modal-content">
@@ -423,7 +340,13 @@ function addImg(myImg){
                 <input type="text" class="form-control" id="pngName">
                 <span class="glyphicon form-control-feedback" id="jsonFeedback"></span>
               </div>
-              
+              <div class="radio">
+              <style>.jscolor-active {z-index:10000!important}</style>
+              <label><input type="radio" value='0' checked="checked" name="optradio">Transparent Background</label>
+              <label><input type="radio" value='FFFFFF' name="optradio" id="background">Pick a color       <button id="pickColor3"
+          class="btn btn-default jscolor {valueElement:'background',value:'FFFFFF',hash:true, position:'top'}"
+          style="width:35px; height:20px; z-index:7000"></button></label>
+              </div>
             </div>
             <div class="modal-footer">
               <button class="btn btn-default"  id="savePNG">PNG</button>
@@ -436,10 +359,13 @@ function addImg(myImg){
 </body>
   <script type="text/javascript">
   // Store the canvas object into a variable
-   var canvas  = document.getElementById('myCanvas');
-   var context = canvas.getContext('2d');
-   var strokeWidth = 1;
+  var canvas  = document.getElementById('myCanvas');
+  var context = canvas.getContext('2d');
+  var strokeWidth = 1;
+  var paintSize = 15;
+
 $(document).ready(function(){
+  $("#changelog").load('log/changelog.html')
   $('[data-toggle="tooltip"]').tooltip({'delay': { show: 1000, hide: 150 }});
   $(".svg").each(function(){
         var $img = jQuery(this).find('img');
@@ -455,67 +381,22 @@ $(document).ready(function(){
         }, 'xml');   
   })
 })
+
 $("body").on('mouseout',".svg", function(){
         var $img = jQuery(this).find('svg');
             $svg=$img;
             $svg.attr('fill', '#777')
             $img.replaceWith($svg);  
 })
+
 $("body").on('mouseover',".svg", function(){
         var $img = jQuery(this).find('svg');
             $svg=$img;
             $svg.attr('fill', 'black')
             $img.replaceWith($svg);  
 })
-$(".font").on('click', function(){
-  var id = $(this).attr('id');
-  $('#textFont').val(id);
-})
-$("#svg").on('click', function(){
-  $('#saveJSONFile').modal({backdrop: 'static', keyboard: false},'show');
-})
-$("#jsonName").on('change keyup',function(){
-  if($(this).val()=='' || $(this).val()==' '){
-    $("#saveJson").addClass('disabled').attr('disabled', true)
-  }else{
-    var name = $(this).val();
-    $.ajax({
-    url: '/check_name',
-    type: 'GET',
-    dataType: 'TEXT',
-    data: {name},
-    }).always(function(check){
-      if(check=='true'){
-        $("#saveJson").removeClass('disabled').attr('disabled', false)
-        $("#jsonForm").removeClass('has-error').addClass('has-success');
-        $("#jsonFeedback").removeClass('glyphicon glyphicon-remove').addClass('glyphicon glyphicon-ok')
-        $("#saveJson").text('Save')
-      }else{
-        $("#saveJson").addClass('disabled').attr('disabled', true)
-        $("#jsonForm").removeClass('has-success').addClass('has-error');
-        $("#jsonFeedback").removeClass('glyphicon glyphicon-ok').addClass('glyphicon glyphicon-remove')
-        $("#saveJson").text('File already exists')
-      }
-    })
-  }
-})
 
-$("#saveJson").on('click', function(){
-  var name = $("#jsonName").val()
-  var json = JSON.stringify(canvas);
-  socket.emit('saveToJSON', json, name);
-  $("#jsonName").val('');
-  $(this).addClass('disabled').attr('disabled', true)
-  $("#jsonForm").removeClass('has-error').removeClass('has-success');
-  $("#jsonFeedback").removeClass('glyphicon glyphicon-ok')
-  $('#saveJSONFile').modal('hide');
-})
-$("#loadJson").on('click', function(){
-    socket.emit('loadFiles');
-    $("#sqlFiles").html('please wait while loading')
-    $('#files').modal({backdrop: 'static', keyboard: false},'show');
-})
-  $("body").on('click','.select-file', function(){
+$("body").on('click','.select-file', function(){
 
    $.ajax({
     url: '/json/'+$(this).text(),
@@ -526,227 +407,7 @@ $("#loadJson").on('click', function(){
       canvas.loadFromJSON(data, canvas.renderAll.bind(canvas)); 
       $('#files').modal('hide');
   });   
-  })
-$(".size").on('click', function(){
-  var id = $(this).attr('id');
-  $('#textSize').val(id);
 })
-$("#textBold, #textItalic, #textUnderline, #textStrike").on('click', function(){
-  $(this).toggleClass('active');
-})
-
-$('#draw').on('click', function(){
-  canvas.isDrawingMode=true;
-  canvas.freeDrawingBrush.color = $("#selectColor").val();
-  strokeWidth = 1;
-  canvas.freeDrawingBrush.width = strokeWidth;
-})
-$('#paint').on('click', function(){
-  canvas.isDrawingMode=true;
-  canvas.freeDrawingBrush.color = $("#selectColor").val();
-  strokeWidth = 15;
-  canvas.freeDrawingBrush.width = strokeWidth;
-  canvas.freeDrawingBrush.strokeLineJoin = 'bevil';
-  canvas.freeDrawingBrush.strokeLineCap = 'round';
-})
-$('#fill').on('click', function(){
-  var o = canvas.getActiveObject();
-  var fill = $("#selectColor").val();
-  if(o.type!=='image'){
-    o.setFill (fill);
-    canvas.renderAll();
-    canvas.trigger('object:modified', {target: o});
-  }else{
-      o.filters.push(new fabric.Image.filters.Tint({
-                color: fill,
-            }));
-            o.applyFilters(canvas.renderAll.bind(canvas));
-  }
-})
-$('#outline').on('click', function(){
-  var o = canvas.getActiveObject();
-  var stroke = $("#selectColor2").val();
-  o.setStroke (stroke);
-  canvas.renderAll();
-  canvas.trigger('object:modified', {target: o});
-})
-$('#noDraw').on('click', function(){
-  canvas.isDrawingMode=false;
-})
-$('#remove').on('click', function(){
-        canvas.getActiveObject().remove();
-})
-$('#addText').on('click', function(){
-        var color = $("#selectColor").val();
-        var label = $("#label").val();
-        var stroke = $("#selectColor2").val();
-        text(label, color, stroke)
-        $("#label").val('');
-})
-$('#clear').on('click', function(){
-  canvas.clear();
-  socket.emit('clear');
-  j=0;
-})
-$("#forward").on('click', function(){
-    var activeObject = canvas.getActiveObject(),
-        activeGroup = canvas.getActiveGroup();
-  // canvas.sendBackwards(myObject)
-  // canvas.sendToBack(myObject)
-  // canvas.bringForward(myObject)
-  canvas.bringToFront(activeObject)
-  emitUpdate()
-})
-$("#back").on('click', function(){
-    var activeObject = canvas.getActiveObject(),
-        activeGroup = canvas.getActiveGroup();
-  // canvas.sendBackwards(myObject)
-  canvas.sendToBack(activeObject)
-  emitUpdate()
-  // canvas.bringForward(myObject)
-  //canvas.bringToFront(activeObject)
-})
-$("#save").on('click', function(){
-$('#savePNGorSVG').modal({backdrop: 'static', keyboard: false},'show');
-})
-$("#savePNG").on('click', function(){
-  var name = $("#pngName").val();
-  var save = document.getElementById("myCanvas"), ctx = canvas.getContext("2d");
-  canvas.backgroundColor="white";
-  canvas.renderAll();
-  save.toBlob(function(blob) {
-    saveAs(blob, name+".png");
-  });
-  $('#savePNGorSVG').modal('hide');
-  $("#pngName").val('');
-})
-$("#saveSVG").click(function(){
-  var name = $("#pngName").val();
-  var trsvg = canvas.toSVG();
-  saveAs(new Blob([trsvg], {type:"application/svg+xml"}), name+".svg")
-  $('#savePNGorSVG').modal('hide');
-  $("#pngName").val('');
-})
-$('#group').on('click', function(){
-  var activegroup = canvas.getActiveGroup();
-  var objectsInGroup = activegroup.getObjects();
-  activegroup.clone(function(newgroup) {
-      canvas.discardActiveGroup();
-      objectsInGroup.forEach(function(object) {
-          canvas.remove(object);
-      });
-      canvas.add(newgroup);
-emitUpdate()
-  });
-});
-$("#ungroup").on('click', function(){
-   var activeObject = canvas.getActiveObject();
-   ungroup(activeObject)
-});
-function ungroup(activeObject){
-  if(activeObject.type=="group"){
-        var items = activeObject._objects;
-        activeObject._restoreObjectsState();
-        canvas.remove(activeObject);
-        for(var i = 0; i < items.length; i++) {
-          canvas.add(items[i]);
-          canvas.item(canvas.size()-1).hasControls = true;
-        }
-        canvas.renderAll();
-  emitUpdate()
-    }
-}
-$('#removeMany').on('click', function(){
-if(canvas.getActiveGroup()){
-      canvas.getActiveGroup().forEachObject(function(o){ canvas.remove(o); });
-      canvas.discardActiveGroup().renderAll();
-    } else {
-      var o=canvas.getActiveObject();
-      canvas.remove(canvas.getActiveObject());
-    }
-emitUpdate()
-})
-$("#clone").on('click', function(){
-  var group;
-  var object;
-  if(canvas.getActiveObject()){
-    var copyData = canvas.getActiveObject().toObject();
-    group=false;
-  }
-  if(canvas.getActiveGroup()){
-    var copyData = canvas.getActiveGroup().toObject();
-    group=true;
-  }
-  canvas.deactivateAll().renderAll();
-  fabric.util.enlivenObjects([copyData], function(objects) {
-    objects.forEach(function(o) {
-      o.set("id", j);
-      j++;
-      o.set('top', o.top + 15);
-      o.set('left', o.left + 15);
-      canvas.add(o);
-      object=o;
-      emitUpdate()
-    });
-    if(group) ungroup(object)
-});
-emitUpdate()
-});
-$("#rectangle").on('click', function(e) {
-  var color = $("#selectColor").val();
-  var stroke = $("#selectColor2").val();
-  rectangle(color,stroke,125,75,100,100);
-})
-$("#rectangleO").on('click', function(e) {
-  var color = '';
-  var stroke = $("#selectColor2").val();
-  rectangle(color,stroke,125,75,100,100);
-})  
-$("#line").on('click', function(e) {
-  var color = $("#selectColor").val();
-  rectangle(color,color, 125,3,100,100);
-})
-$("#triangle").on('click', function(e) {
-  var color = $("#selectColor").val();
-  var stroke = $("#selectColor2").val();
-  triangle(color, stroke);
-})
-$("#triangleO").on('click', function(e) {
-  var color = '';
-  var stroke = $("#selectColor2").val();
-  triangle(color, stroke);
-})
-$("#circle").on('click', function(e) {
-  var stroke = $("#selectColor2").val();
-  var color = $("#selectColor").val();
-  circle(color, stroke);
-})
-$("#circleO").on('click', function(e) {
-  var stroke = $("#selectColor2").val();
-  var color = '';
-  circle(color, stroke);
-})
-$("#lineVertical").on('click', function(e) {
-  var color = $("#selectColor").val();
-  rectangle(color,color, 3,125,100,100);
-})
-
-$("#addServer").on('click', function(e) { addImg(serverImg);  })
-$("#addServers").on('click', function(e) {  addImg(serversImg); })
-$("#addLib").on('click', function(e) {  addImg(libImg); })
-$("#addPC").on('click', function(e) { addImg(pcImg);  })
-$("#addDb").on('click', function(e) { addImg(dbImg);  })
-$("#addArrow").on('click', function(e) {  addImg(arrow);  })
-$("#addArrows").on('click', function(e) {  addImg(arrows); })
-$("#addCache").on('click', function(e) {  addImg(cache);  })
-$("#addFtp").on('click', function(e) {  addImg(ftp);  })
-$("#addUnc").on('click', function(e) {  addImg(unc);  })
-$("#addPC2").on('click', function(e) {  addImg(pcImg2); })
-$("#addLib2").on('click', function(e) {  addImg(libImg2);  })
-$("#line").on('click', function(e) {  addImg(lineH);  })
-$("#addNews").on('click', function(e) {  addImg(news);  })
-$("#lineVertical").on('click', function(e) {  addImg(lineV);  })
-$("#lineDiag").on('click', function(e) {  addImg(lineD);  })
 
 // create a wrapper around native canvas element (with id="c")
 var canvas = new fabric.Canvas('myCanvas', {preserveObjectStacking: false});
@@ -761,70 +422,4 @@ canvas.on('path:created', function() {
 canvas.on('object:added', function(options) {
 //do nothing
 }, false)
-// create a rectangle object
-function rectangle(color,stroke, width, height, left, top){
-  var rect = new fabric.Rect({
-    id: j,left: left,top: top,fill: color,stroke: stroke,width: width,height: height
-  });
-  canvas.add(rect);
-emitUpdate()
-}
-function text(label, fill, stroke){
-  var font = $("#textFont").val();
-  var fontSize = $("#textSize").val();
-  var fontWeight = ($("#textBold").hasClass('active') ? 'bold' : 'normal');
-  var fontStyle = ($("#textItalic").hasClass('active') ? 'italic' : 'normal');
-  var textDecoration1 = ($("#textUnderline").hasClass('active') ? 'underline' : '');
-  var textDecoration2 = ($("#textStrike").hasClass('active') ? 'line-through' : '');
-
-if(textDecoration1!='' && textDecoration2 !=''){
-  textDecoration = textDecoration1+','+textDecoration2;
-}else{
-  if(textDecoration1==''){
-    textDecoration = textDecoration2;
-  }else{
-    textDecoration = textDecoration1;
-  }
-}
-  switch (font) {
-    case 'times': fontFamily = 'Times New Roman, Times, serif'; break;
-    case 'arial': fontFamily = 'Arial, Helvetica, sans-serif'; break;
-    case 'verdana': fontFamily = 'Verdana,Geneva,sans-serif'; break;
-    case 'comic': fontFamily = '"Comic Sans MS", cursive, sans-serif'; break;
-    case 'courier': fontFamily = '"Courier New", Courier, monospace'; break;
-  }
-  var text = new fabric.Text(label, {
-    id: j,fontFamily,fontWeight,fontStyle,textDecoration,fontSize,fill,stroke,originX: 'center',originY: 'center',left: 100,top: 100,
-  });
-  canvas.add(text)
-emitUpdate()
-}
-function circle(fill, stroke){
-  var circle = new fabric.Circle({
-    id:j,radius: 30, fill, left: 100, top: 100, stroke
-  });
-  canvas.add(circle)
-emitUpdate()
-}
-function triangle(fill, stroke){
-  var triangle = new fabric.Triangle({
-    id:j,width: 50, height: 50, fill, left: 50, top: 50, stroke
-  });
-  canvas.add(triangle)
-emitUpdate()
-}
-function emitUpdate(){
-  j++;
-  modified=true;
-  var json = JSON.stringify(canvas);
-  socket.emit('update', json, j);
-}
-$("#help").on('click', function(){
-  $("#viewport").hide();
-  $('#helpPage').show();
-})
-$("#closeHelp").on('click', function(){
-  $("#viewport").show();
-  $('#helpPage').hide();
-})
 </script>

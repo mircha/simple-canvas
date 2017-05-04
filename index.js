@@ -72,9 +72,11 @@ app.get('/check_name', function(req, res, name) {
 	})
 });
 app.use('/js', express.static(path.join(__dirname, 'js')))
+app.use('/css', express.static(path.join(__dirname, 'css')))
 app.use('/img', express.static(path.join(__dirname, 'img')))
 app.use('/help', express.static(path.join(__dirname, 'help')))
 app.use('/json', express.static(path.join(__dirname, 'json')))
+app.use('/log', express.static(path.join(__dirname, 'log')))
 
 http.listen(3000, function(){
 	console.log('listening on port 3000!')
