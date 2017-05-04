@@ -5,7 +5,6 @@
 <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jcanvas/16.7.3/jcanvas.js"></script>-->
 <script type="text/javascript" src="js/FileSaver.min.js"></script>
 <script src="js/jscolor.min.js"></script>
-
 <!--<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.9/fabric.min.js"></script>-->
 <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.11/fabric.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script><!--socketIO-->
@@ -20,9 +19,7 @@
 <script type="text/javascript">
 var socketid='';
 
-
-// var socket = io('http://192.168.0.112:3000');
-
+//var socket = io('http://192.168.0.114:3000');
 var socket = io('http://127.0.0.1:3000');
 var j=0;
 var k=0;
@@ -57,10 +54,18 @@ socket.on('connect', function () {
 });
 socket.on('updateCanvas', function(json, k){
   canvas.loadFromJSON(json, canvas.renderAll.bind(canvas), function(o, object) {
-       fabric.log(o, object);
+       //fabric.log(o, object);
        k=j;
   })
 })
+socket.on('resFiles', function(sql){
+    var list = '<ul style="list-style-type:none; text-align:left">';
+    for (i=0;i<sql.length;i++){
+      list +=`<li id="${i}" class="select-file">${sql[i].name}</li><input type="hidden" value="${sql[i].sql}" id="sql_${i}">` 
+    }
+    list+='</ul>';
+    $("#sqlFiles").html(list);
+  })
 function addImg(myImg){
     fabric.Image.fromURL(myImg, function(oImg) {
         oImg.set('id', parseInt(j));
@@ -79,35 +84,40 @@ function addImg(myImg){
         });
 }
 </script>
-<div style="float:left;z-index:1000">
-
-
+<!DOCTYPE html>
+<html>
+<head>
+<title>Whiteboard</title>
+</head>
+<body>
+<div id="content">
 <nav class="navbar navbar-default" style="margin-bottom:5px">
   <div class="container-fluid">
     <div class="navbar-header">
-      <span class="navbar-brand" href="#">Whiteboard <small style="font-size:12px">v1.8_beta</small></span>
+      <span class="navbar-brand" href="#">Whiteboard <small style="font-size:12px">v1.9_beta</small></span>
     </div>
      <ul class="nav navbar-nav">
       <li><a href="#" style="font-size: 21px" id="save" data-toggle="tooltip" data-placement="bottom" title="Save&nbsp;image"><i class="fa fa-floppy-o"></i></a></li>
       <li><a href="#" style="font-size: 21px" id="svg" class="svg" data-toggle="tooltip" data-placement="bottom" title="Save&nbsp;JSON"><img src="img/laptop-code.svg" style="width:21px; height:21px"/></a></li>
+      <li><a href="#" style="font-size: 21px" id="loadJson" data-toggle="tooltip" data-placement="bottom" title="Load&nbsp;JSON"><i class="fa fa-folder-open"></i></a></li>
       <li><a href="#"  style="font-size: 21px" id="clear" class="svg" data-toggle="tooltip" data-placement="bottom" title="Clear&nbsp;canvas"><img src="img/clean.svg" style="width:21px; height:21px"/></a></li>
- <li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li>
+  <li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li>
       <li><a href="#" style="font-size: 21px" id="removeMany" data-toggle="tooltip" data-placement="bottom" title="Delete"><i class="fa fa-trash-o"></i></a></li>
       <li><a href="#" style="font-size: 21px" id="group" data-toggle="tooltip" data-placement="bottom" title="Group"><i class="fa fa-object-group"></i></a></li>
       <li><a href="#" style="font-size: 21px" id="ungroup" data-toggle="tooltip" data-placement="bottom" title="Ungroup"><i class="fa fa-object-ungroup"></i></a></li>
       <li><a href="#" style="font-size: 21px" id="forward" data-toggle="tooltip" data-placement="bottom" title="Bring&nbsp;Forward"><i class="fa fa-level-up"></i></a></li>
       <li><a href="#" style="font-size: 21px" id="back" data-toggle="tooltip" data-placement="bottom" title="Send&nbsp;Back"><i class="fa fa-level-down"></i></a></li>
 
-<li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li>
+  <li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li>
       <li><a href="#" style="font-size: 21px" id="noDraw" class="svg" data-toggle="tooltip" data-placement="bottom" title="Select&nbsp;Mode"><img src="img/select.svg" style="width:21px; height:21px"/></a></li>
       <li><a href="#" style="font-size: 21px" id="draw" data-toggle="tooltip" data-placement="bottom" title="Pencil&nbsp;Mode"><i class="glyphicon glyphicon-pencil"></i></a></li>
       <li><a href="#" style="font-size: 21px" id="paint" data-toggle="tooltip" data-placement="bottom" title="Brush&nbsp;Mode"><i class="fa fa-paint-brush"></i></a></li>
       <li><a href="#" style="font-size: 21px" id="clone" class="svg" data-toggle="tooltip" data-placement="bottom" title="Duplicate"><img src="img/clone.svg" style="width:21px; height:21px"/></a></li>
-<li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li>
+  <li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li>
       <li><a href="#" style="font-size: 21px" id="help" data-toggle="tooltip" data-placement="bottom" title="Help"><i class="fa fa-question"></i></a></li>
     </ul>
 
-<!--     <ul class="nav navbar-nav navbar-right">
+  <!--     <ul class="nav navbar-nav navbar-right">
       <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
       <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
     </ul> -->
@@ -130,7 +140,6 @@ function addImg(myImg){
             <img src="img/shapes.svg" style="width: 23px; height:23px;" />
             <span class = "caret"></span>
          </button>
-
        <ul class = "dropdown-menu" role = "menu" style="text-align: center">
         <li class="btn-group">
           <button class="btn btn-default" style="font-size: 21px" id="rectangle"><i class="fa fa-square"></i></button>
@@ -168,21 +177,20 @@ function addImg(myImg){
         </li>
         <li class="btn-group">
           <button class="btn btn-default" style="font-size: 21px" id="addFtp"><img style="width: 21px; height:21px;" src="img/antenna.svg"/></button>
-          <button class="btn btn-default" style="font-size: 21px" id="addUnc"><img style="width: 21px; height:21px;" src="img/network.svg"/></i></button>
+          <button class="btn btn-default" style="font-size: 21px" id="addUnc"><img style="width: 21px; height:21px;" src="img/network.svg"/></button>
           <button class="btn btn-default" style="font-size: 21px" id="addArrows"><i class="fa fa-exchange fa-rotate-90"></i></button>
         </li>
         <li class="btn-group">
           <button class="btn btn-default" style="font-size: 21px" id="addLib2"><img style="width: 21px; height:21px;" src="img/library.svg"/></button>
-          <button class="btn btn-default" style="font-size: 21px" id="addPC2"><img style="width: 21px; height:21px;" src="img/server2.svg"/></i></button>
-          <button class="btn btn-default" style="font-size: 21px" id="addCache"><img style="width: 21px; height:21px;" src="img/database-alt1.svg"/></i></button>
+          <button class="btn btn-default" style="font-size: 21px" id="addPC2"><img style="width: 21px; height:21px;" src="img/server2.svg"/></button>
+          <button class="btn btn-default" style="font-size: 21px" id="addCache"><img style="width: 21px; height:21px;" src="img/database-alt1.svg"/></button>
         </li>
         <li>
-          <button class="btn btn-default" style="font-size: 21px" id="addNews"><img style="width: 21px; height:21px;" src="img/news.svg"/></i></button>
+          <button class="btn btn-default" style="font-size: 21px" id="addNews"><img style="width: 21px; height:21px;" src="img/news.svg"/></button>
         </li>
        </ul>
     </div>
-
-  </div>
+</div>
   <div class="col-md-3" style="float:left, text-align: center;">
     <h5>Color Picker</h5>
       <label for="pickColor"><i class="glyphicon glyphicon-text-background" style="font-size:16px;vertical-align:middle"></i></label>
@@ -237,8 +245,7 @@ function addImg(myImg){
         </div>
   </div>
   <div class="clearfix"></div>
-</div>
-</div>
+
 <div id="helpPage" class="carousel slide" data-ride="carousel" data-interval="false" style="display: none; width:1300px;height:540px; z-index:9999; margin:0 auto; text-align:center!important">
   <!-- Indicators -->
 
@@ -246,14 +253,12 @@ function addImg(myImg){
   <div class="carousel-inner" style="">
     <div class="item active">
       <img src="help/shapes.png" alt="Los Angeles" class="center-block" style="height:508px">
-
     </div>
 
     <div class="item">
       <img src="help/buttons.png" alt="Chicago" class="center-block" style="height:508px">
     </div>
   </div>
-
   <!-- Left and right controls -->
   <a class="left carousel-control" href="#helpPage" data-slide="prev">
     <span class="glyphicon glyphicon-chevron-left"></span>
@@ -264,43 +269,25 @@ function addImg(myImg){
     <span class="sr-only">Next</span>
   </a>
 <button class="btn btn-default" id="closeHelp">Close Help</button>
-<div class="col-md-3" style="text-align:left!important" style="width:24%">
-  <div style="overflow:none; z-index:-10">
-    <h5>Mode</h5>
-    <div class="btn-group">
-      <button class="btn btn-default" style="font-size: 21px" id="noDraw"><img src="img/select.svg" style="width:21px; height:21px"/></button>
-      <button class="btn btn-default" style="font-size: 21px" id="draw"><i class="glyphicon glyphicon-pencil"></i></button>
-      <button class="btn btn-default" style="font-size: 21px" id="paint"><i class="fa fa-paint-brush"></i></button>
-      <button class="btn btn-default" style="font-size: 21px" id="clone"><img src="img/clone.svg" style="width:21px; height:21px"/></button>
-    </div>
-
-  </div>
-  <div>
-    <h5>Edit</h5>
-    <div class="btn-group">
-      <button class="btn btn-default" style="font-size: 21px" id="removeMany"><i class="fa fa-trash-o"></i></button>
-      <button class="btn btn-default" style="font-size: 21px" id="group"><i class="fa fa-object-group"></i></button>
-      <button class="btn btn-default" style="font-size: 21px" id="ungroup"><i class="fa fa-object-ungroup"></i></button>
-      <button class="btn btn-default" style="font-size: 21px" id="forward"><i class="fa fa-level-up"></i></button>
-      <button class="btn btn-default" style="font-size: 21px" id="back"><i class="fa fa-level-down"></i></button>
-    </div>
-  </div>
-  <div>
-    <h5>File</h5>
-    <div class="btn-group">
-      <button class="btn btn-default" style="font-size: 21px" id="save"><i class="fa fa-floppy-o"></i></button>
-      <button class="btn btn-default" style="font-size: 21px" id="clear"><img src="img/clean.svg" style="width:21px; height:21px"/></button>
-      <button class="btn btn-default" style="font-size: 21px" id="svg"><img src="img/laptop-code.svg" style="width:21px; height:21px"/></button>
-      <button class="btn btn-default" style="font-size: 21px" id="help" data-toggle="modal" data-target="#helpModal"><i class="fa fa-question"></i></button>
-    </div>
-  </div>
 </div>
-  <div class="panel-group" id="accordion" style="position: fixed; bottom:0;left:0; width:100%;padding:0; margin:0">
+
+<div class="panel-group" id="accordion" style="position: fixed; bottom:0;left:0; width:100%;padding:0; margin:0">
     <div class="panel panel-default">
       <div id="collapse1" class="panel-collapse collapse out">
         <div class="panel-body" style="max-height: 450px; overflow-y:scroll">
           <p>
-            <u>May 2-3, 2017 - v1.6_beta</u>
+            <u>May 4, 2017 - v1.9_beta</u>
+            <ul>
+              <li> Code cleanup due to mistake when downloading from GitHub</li>
+              <li> Enabled Save To JSON (from ./json folder)</li>
+              <li> Added load from JSON (from ./json folder)</li>
+              <li> Added name check for save to JSON (no overwriting)</li>
+              <li> Modified Save to image - split into save to PNG and save to SVG</li>
+              <li> Can add name when saving to png/svg</li>
+            </ul>
+          </p>
+          <p>
+            <u>May 2-3, 2017 - v1.8_beta</u>
             <ul>
               <li> Clone multiple objects at the same time</li>
               <li> Added help</li>
@@ -321,7 +308,6 @@ function addImg(myImg){
           </p>
           <p>
             <u>Apr 29 - 30, 2017 - v1.5_beta </u>
-
             <ul>
               <li> Changed drawing algorithm, added JSON emit</li>
               <li> Added more advanced shapes and changed all to svgs</li>
@@ -330,7 +316,6 @@ function addImg(myImg){
               <li> Code refactoring and cleanup (added 145 lines, removed 552)</li>
             </ul>
           </p>
-          <p>
           <p>
             <u>Apr 28, 2017 - v1.3_beta</u>
             <ul>
@@ -382,6 +367,73 @@ function addImg(myImg){
         </h4>
       </div>
     </div>
+</div>
+</div>
+<!-- Load JSON modal -->
+      <div id="files" class="modal fade" role="dialog" style="z-index:99999; text-align:center; width:100%">
+        <div class="modal-dialog">
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title">Files</h4>
+            </div>
+            <div class="modal-body" style="margin:0 auto; width:50%">
+              <div id="sqlFiles">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+<!-- Load JSON modal -->
+<!-- Save JSON modal -->
+      <div id="saveJSONFile" class="modal fade" role="dialog" style="z-index:99999; text-align:center; width:100%">
+        <div class="modal-dialog">
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title">Save to JSON</h4>
+            </div>
+            <div class="modal-body" style="margin:0 auto; width:50%">
+              <div class="form-group has-feedback" id="jsonForm">
+                <input type="text" class="form-control" id="jsonName">
+                <span class="glyphicon form-control-feedback" id="jsonFeedback"></span>
+              </div>
+              
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-default disabled" disabled id="saveJson">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+<!-- Save JSON modal -->
+<!-- Save PNG/SVG modal -->
+      <div id="savePNGorSVG" class="modal fade" role="dialog" style="z-index:99999; text-align:center; width:100%">
+        <div class="modal-dialog">
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title">Save to Disk</h4>
+            </div>
+            <div class="modal-body" style="margin:0 auto; width:50%">
+              <div class="form-group has-feedback" id="pngForm">
+                <input type="text" class="form-control" id="pngName">
+                <span class="glyphicon form-control-feedback" id="jsonFeedback"></span>
+              </div>
+              
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-default"  id="savePNG">PNG</button>
+              <button class="btn btn-default"  id="saveSVG">SVG</button>
+            </div>
+          </div>
+        </div>
+      </div>
+<!-- Save PNG/SVG modal -->
+</body>
   <script type="text/javascript">
   // Store the canvas object into a variable
    var canvas  = document.getElementById('myCanvas');
@@ -420,8 +472,61 @@ $(".font").on('click', function(){
   $('#textFont').val(id);
 })
 $("#svg").on('click', function(){
-  emitUpdate()
+  $('#saveJSONFile').modal({backdrop: 'static', keyboard: false},'show');
 })
+$("#jsonName").on('change keyup',function(){
+  if($(this).val()=='' || $(this).val()==' '){
+    $("#saveJson").addClass('disabled').attr('disabled', true)
+  }else{
+    var name = $(this).val();
+    $.ajax({
+    url: '/check_name',
+    type: 'GET',
+    dataType: 'TEXT',
+    data: {name},
+    }).always(function(check){
+      if(check=='true'){
+        $("#saveJson").removeClass('disabled').attr('disabled', false)
+        $("#jsonForm").removeClass('has-error').addClass('has-success');
+        $("#jsonFeedback").removeClass('glyphicon glyphicon-remove').addClass('glyphicon glyphicon-ok')
+        $("#saveJson").text('Save')
+      }else{
+        $("#saveJson").addClass('disabled').attr('disabled', true)
+        $("#jsonForm").removeClass('has-success').addClass('has-error');
+        $("#jsonFeedback").removeClass('glyphicon glyphicon-ok').addClass('glyphicon glyphicon-remove')
+        $("#saveJson").text('File already exists')
+      }
+    })
+  }
+})
+
+$("#saveJson").on('click', function(){
+  var name = $("#jsonName").val()
+  var json = JSON.stringify(canvas);
+  socket.emit('saveToJSON', json, name);
+  $("#jsonName").val('');
+  $(this).addClass('disabled').attr('disabled', true)
+  $("#jsonForm").removeClass('has-error').removeClass('has-success');
+  $("#jsonFeedback").removeClass('glyphicon glyphicon-ok')
+  $('#saveJSONFile').modal('hide');
+})
+$("#loadJson").on('click', function(){
+    socket.emit('loadFiles');
+    $("#sqlFiles").html('please wait while loading')
+    $('#files').modal({backdrop: 'static', keyboard: false},'show');
+})
+  $("body").on('click','.select-file', function(){
+
+   $.ajax({
+    url: '/json/'+$(this).text(),
+    dataType: 'json',
+  })
+  .fail(function() {  console.log("error"); })
+  .always(function(data) {
+      canvas.loadFromJSON(data, canvas.renderAll.bind(canvas)); 
+      $('#files').modal('hide');
+  });   
+  })
 $(".size").on('click', function(){
   var id = $(this).attr('id');
   $('#textSize').val(id);
@@ -502,12 +607,25 @@ $("#back").on('click', function(){
   //canvas.bringToFront(activeObject)
 })
 $("#save").on('click', function(){
+$('#savePNGorSVG').modal({backdrop: 'static', keyboard: false},'show');
+})
+$("#savePNG").on('click', function(){
+  var name = $("#pngName").val();
   var save = document.getElementById("myCanvas"), ctx = canvas.getContext("2d");
   canvas.backgroundColor="white";
   canvas.renderAll();
   save.toBlob(function(blob) {
-    saveAs(blob, "whiteboard.png");
-});
+    saveAs(blob, name+".png");
+  });
+  $('#savePNGorSVG').modal('hide');
+  $("#pngName").val('');
+})
+$("#saveSVG").click(function(){
+  var name = $("#pngName").val();
+  var trsvg = canvas.toSVG();
+  saveAs(new Blob([trsvg], {type:"application/svg+xml"}), name+".svg")
+  $('#savePNGorSVG').modal('hide');
+  $("#pngName").val('');
 })
 $('#group').on('click', function(){
   var activegroup = canvas.getActiveGroup();
@@ -567,7 +685,6 @@ $("#clone").on('click', function(){
       o.set('top', o.top + 15);
       o.set('left', o.left + 15);
       canvas.add(o);
-
       object=o;
       emitUpdate()
     });
@@ -575,13 +692,11 @@ $("#clone").on('click', function(){
 });
 emitUpdate()
 });
-
 $("#rectangle").on('click', function(e) {
   var color = $("#selectColor").val();
   var stroke = $("#selectColor2").val();
   rectangle(color,stroke,125,75,100,100);
 })
-
 $("#rectangleO").on('click', function(e) {
   var color = '';
   var stroke = $("#selectColor2").val();
@@ -591,7 +706,6 @@ $("#line").on('click', function(e) {
   var color = $("#selectColor").val();
   rectangle(color,color, 125,3,100,100);
 })
-
 $("#triangle").on('click', function(e) {
   var color = $("#selectColor").val();
   var stroke = $("#selectColor2").val();
@@ -601,9 +715,7 @@ $("#triangleO").on('click', function(e) {
   var color = '';
   var stroke = $("#selectColor2").val();
   triangle(color, stroke);
-
 })
-
 $("#circle").on('click', function(e) {
   var stroke = $("#selectColor2").val();
   var color = $("#selectColor").val();
