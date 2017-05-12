@@ -20,12 +20,16 @@
 
 <script type="text/javascript">
 var socketid='';
-//var socket = io('http://192.168.0.114:3000');
-var socket = io('http://127.0.0.1:3000');
+var socket = io('http://192.168.0.114:3000');
+//var socket = io('http://127.0.0.1:3000');
 var j=0;
 var k=0;
 var modified = true;
 var modifiedBroadcast = false;
+var arrow = false;
+var arrowStraight = false;
+var arrowQ =false;
+var randomNumber = 10*Math.random(10);
 
 var serverImg = 'img/srv.svg';
 var serversImg = 'img/servers.svg';
@@ -34,7 +38,7 @@ var pcImg2 = 'img/server2.svg';
 var libImg = 'img/library2.svg';
 var libImg2 = 'img/library.svg';
 var dbImg = 'img/database.svg';
-var arrow = 'img/arrow.svg';
+var arrowIMG = 'img/arrow.svg';
 var arrows = 'img/arrows.svg';
 var ftp = 'img/antenna.svg';
 var unc = "img/network.svg";
@@ -43,11 +47,19 @@ var news = "img/news.svg";
 var lineH = "img/substract.svg";
 var lineD='img/diagonal-line.svg';
 var lineV='img/icon.svg';
+var cloud = 'img/cloud.svg';
+var chat = 'img/chat.svg';
+var arrow2 = 'img/downward-rotation.svg';
 
 socket.on('connect', function () {
   socket.on('socketid', function (socket) {
     socketid = socket;
   });
+  setTimeout(function(){
+    if(socketid){
+      identify('gigel');
+    }
+  },1000)
   socket.on('clearCanvas',function(){
     canvas.clear();
     j=0;
@@ -79,7 +91,7 @@ socket.on('resFiles', function(sql){
 <nav class="navbar navbar-default" style="margin-bottom:5px">
   <div class="container-fluid">
     <div class="navbar-header">
-      <span class="navbar-brand" href="#">Whiteboard <small style="font-size:12px">v1.9_beta</small></span>
+      <span class="navbar-brand" href="#">Whiteboard <small style="font-size:12px">v2.2_beta</small></span>
     </div>
      <ul class="nav navbar-nav">
       <li><a href="#" style="font-size: 21px" id="save" data-toggle="tooltip" data-placement="bottom" title="Save&nbsp;image"><i class="fa fa-floppy-o"></i></a></li>
@@ -94,6 +106,8 @@ socket.on('resFiles', function(sql){
       <li><a href="#" style="font-size: 21px" id="back" data-toggle="tooltip" data-placement="bottom" title="Send&nbsp;Back"><i class="fa fa-level-down"></i></a></li>
   <li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li>
       <li><a href="#" style="font-size: 21px" id="clone" class="svg" data-toggle="tooltip" data-placement="bottom" title="Duplicate"><img src="img/clone.svg" style="width:21px; height:21px"/></a></li>
+      <li><a href="#" style="font-size: 21px"  class="svg" data-placement="bottom" data-toggle="popover"><img src="img/square-shadow.svg" style="width:21px; height:21px"/></a></li>
+      <li><a href="#" style="font-size: 21px"  class="svg" data-placement="bottom" data-toggle="popover2"><img src="img/rotate.svg" style="width:21px; height:21px"/></a></li>
   <li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li>
       <li><a href="#" style="font-size: 21px" id="help" data-toggle="tooltip" data-placement="bottom" title="Help"><i class="fa fa-question"></i></a></li>
     </ul>
@@ -165,8 +179,10 @@ socket.on('resFiles', function(sql){
           <button class="btn btn-default" style="font-size: 21px" id="addPC2"><img style="width: 21px; height:21px;" src="img/server2.svg"/></button>
           <button class="btn btn-default" style="font-size: 21px" id="addCache"><img style="width: 21px; height:21px;" src="img/database-alt1.svg"/></button>
         </li>
-        <li>
+        <li class="btn-group">
           <button class="btn btn-default" style="font-size: 21px" id="addNews"><img style="width: 21px; height:21px;" src="img/news.svg"/></button>
+          <button class="btn btn-default" style="font-size: 21px" id="addCloud"><img style="width: 21px; height:21px;" src="img/cloud.svg"/></button>
+          <button class="btn btn-default" style="font-size: 21px" id="addChat"><img style="width: 21px; height:21px;" src="img/chat.svg"/></button>
         </li>
        </ul>
     </div>
@@ -176,9 +192,12 @@ socket.on('resFiles', function(sql){
             <span class = "caret"></span>
          </button>
             <ul class = "dropdown-menu" role = "menu" style="text-align: center">
-             <li class="btn-group">
+             <li class="btn-group" style="width:190px">
               <button class="btn btn-default" style="font-size: 21px" id="draw"><i class="glyphicon glyphicon-pencil"></i></button>
               <button class="btn btn-default" style="font-size: 21px" id="paint"><i class="fa fa-paint-brush"></i></button>
+              <button class="btn btn-default" id="drawArrow"><img style="width: 21px; height:21px; padding:0; margin:0" src="img/swirly-arrow.svg"/></button>
+              <button class="btn btn-default" id="drawArrowStraight"><img style="width: 21px; height:21px; padding:0; margin:0" src="img/up-arrow.svg"/></button>
+              <button class="btn btn-default" id="drawQuad"><img style="width: 21px; height:21px; padding:0; margin:0" src="img/semicircular-up-arrow.svg"/></button>
             </li>
               <li class="btn-group">
                 <input id="strokeSelect" type="range" min="4" max="99" step="1" value="15" style="width:80px; float:left; height:10px; padding-right:3px" />
@@ -186,13 +205,15 @@ socket.on('resFiles', function(sql){
               </li>
           </ul>
       </div>
-      <div class = "btn-group dropup">
+
          <button id="noDraw" type = "button" class = "btn btn-default">
             <img src="img/select.svg" style="width: 23px; height:23px;" />
          </button>
-      </div>
+
 </div>
   <div class="col-md-3" style="float:left, text-align: center;">
+    
+    <div style="float:left">
     <h5>Color Picker</h5>
       <label for="pickColor"><i class="glyphicon glyphicon-text-background" style="font-size:16px;vertical-align:middle"></i></label>
       <button id="pickColor"
@@ -204,8 +225,14 @@ socket.on('resFiles', function(sql){
           style="width:35px; height:20px;"></button>
       <input id="selectColor2" value="FFFFFF" style="display:none">
       <input id="selectColor" value="FFFFFF" style="display:none">
-      <button class="btn btn-default" id="fill" class="svg2"><img src="img/fill.svg" style="width: 23px; height:23px;" /></button>
-      <button class="btn btn-default" id="outline"><img src="img/border.svg" style="width: 23px; height:23px;" /></button>
+      </div>
+      <div class="col-md-6" style="margin-top: 4px">
+      <button class="btn btn-default" id="fill" class="svg2"><img src="img/fill.svg" style="width: 21px; height:21px;" /></button>
+      <button class="btn btn-default" id="outline"><img src="img/border.svg" style="width: 21px; height:21px;" /></button>
+      
+      <button class="btn btn-default" id="removeFill"><img src="img/clear_background.svg" style="width: 21px; height:21px;" /></button>
+      <button class="btn btn-default" id="removeOutline"><img src="img/clear_outline.svg" style="width: 21px; height:21px;" /></button>
+      </div>
   </div>
 <style type="text/css">
   .btn-group.btn {   border: 0;   padding: 0; }
@@ -356,6 +383,31 @@ socket.on('resFiles', function(sql){
         </div>
       </div>
 <!-- Save PNG/SVG modal -->
+<div id="shadowOptions"  class="hide">
+  <div class="btn-group center-block col-md-11">
+    <button id="shadow" class="btn btn-default">
+      <img src="img/square-shadow.svg" style="width:11px; height:14px"/>
+    </button>
+    <button id="removeShadow" class="btn btn-default"><i class="fa fa-times"></i></button>
+  </div>
+<div class="form-group" style="width:120px!important; text-align:left; vertical-align:middle; font-size:10px">
+
+  <label for="blur" class="col-md-5" style="line-height:2.5">Blur </label><input type="text" id="blur" value="5" class="form-control" style="width:45px">
+  <label for="offsetx" class="col-md-5">Offset X </label><input type="text" id="offsetx" value="5" class="form-control" style="width:45px">
+  <label for="offsety" class="col-md-5">Offset Y </label><input type="text" id="offsety" value="7" class="form-control" style="width:45px">
+</div>
+</div>
+<div id="rotation" class="hide">
+<div class="btn-group center-block col-md-12">
+  <button id="clockwise" class="btn btn-default"><img src="img/rotate-45.svg" style="width:12px; height:14px" id="cw"/></button>
+  <button id="counterClockwise" class="btn btn-default"><img src="img/rotate45.svg" style="width:12px; height:14px" id="ccw"/></button>
+  <button id="flipX" class="btn btn-default"><img src="img/repeat.svg" style="width:12px; height:14px;" id="fx"/></button>
+  <button id="flipY" class="btn btn-default"><img src="img/repeat.svg" style="width:12px; height:14px; transform: rotate(90deg)" id="fy"/></button>
+</div>
+<div class="form-group" style="width:190px!important; text-align:center; vertical-align:middle; font-size:10px; max-height:20px!important; height:auto">
+&nbsp;
+</div>
+</div>
 </body>
   <script type="text/javascript">
   // Store the canvas object into a variable
@@ -364,7 +416,35 @@ socket.on('resFiles', function(sql){
   var strokeWidth = 1;
   var paintSize = 15;
 
+function identify(name, socket){
+  $.ajax({
+    url: '/identity',
+    type: 'GET',
+    data: {name, socket},
+  })
+  .done(function() {
+    console.log("success");
+  })
+  .fail(function() {
+    console.log("error");
+  })
+  .always(function(data) {
+    console.log(data);
+  });
+  
+}
+
 $(document).ready(function(){
+  $('[data-toggle="popover"]').popover({content: function () {
+                                        return $('#shadowOptions').html();
+                                        }, 
+                                        html: true,
+                                      });
+  $('[data-toggle="popover2"]').popover({content: function () {
+                                        return $('#rotation').html();
+                                        }, 
+                                        html: true,
+                                      });
   $("#changelog").load('log/changelog.html')
   $('[data-toggle="tooltip"]').tooltip({'delay': { show: 1000, hide: 150 }});
   $(".svg").each(function(){
@@ -416,7 +496,33 @@ canvas.on('object:modified', function(){
   emitUpdate()
 },false);
 modified = false;
-canvas.on('path:created', function() {
+
+canvas.on('path:created', function(path) {
+  if(arrow==true){
+  var pivot =[];
+  var end = path.path.path[path.path.path.length-1];
+  var start = path.path.path[0];
+  if(path.path.path.length>10){
+      pivot = path.path.path[path.path.path.length-10];
+  }
+  else{
+      pivot[1] = 0;
+      pivot[2] = 0;
+    }
+
+  addArrowHead(parseInt(end[1]), parseInt(end[2]),parseInt(start[1]), parseInt(start[2]), path, parseInt(pivot[1]), parseInt(pivot[2]),)
+
+  }
+  if(arrowStraight == true){
+    var end = path.path.path[path.path.path.length-1];
+    var start = path.path.path[0];
+    straightArrow(parseInt(end[1]), parseInt(end[2]),parseInt(start[1]), parseInt(start[2]), path)
+  }
+  if(arrowQ == true){
+    var end = path.path.path[path.path.path.length-1];
+    var start = path.path.path[0];
+    qArrow(parseInt(end[1]), parseInt(end[2]),parseInt(start[1]), parseInt(start[2]), path)
+  }
   emitUpdate()
 })
 canvas.on('object:added', function(options) {

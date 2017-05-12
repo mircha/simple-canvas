@@ -5,15 +5,19 @@ var io = require('socket.io')(http);
 var fs = require('fs-extra');
 
 var socketid =[];
-
+var names = [];
 io.sockets.on('connection', function(socket){
 	socketid.push(socket.id);
+	
 	socket.join('chat');
 	setTimeout(function(){
 	io.sockets.in(socketid).emit('socketid', socket.id);
 		console.log(socket.id + ' connected')
 		console.log(socketid + ' clients')
 	},100)
+
+	console.log(Object.keys(io.engine.clients))
+	console.log(names)
 
 	socket.on('disconnect', function(){
 		var index = socketid.indexOf(socket.id);
@@ -25,6 +29,7 @@ io.sockets.on('connection', function(socket){
 	})
 	socket.on('clear', function(){
 		socket.broadcast.to('chat').emit('clearCanvas');
+
 	})
 	socket.on('saveToJSON', function(json, name){
 		var file = __dirname+'/json/'+name+'.json';
@@ -33,7 +38,7 @@ io.sockets.on('connection', function(socket){
 	socket.on('loadFiles', function(){
     	var files=loadQuery(sql);
     	setTimeout(function(){  io.emit('resFiles',files)  }, 500)
-  })
+  	})
 });
 var sql = [];
 const testFolder = './json/';
@@ -42,12 +47,14 @@ var path = require('path')
 function loadQuery(sql){
     fs.readdir(testFolder, (err, files) => {
       sql.length=0;
-      files.forEach(file => {
+
+      files.filter(file => {return path.extname(file)==='.json'}).forEach(file => {
         fs.readFile(path.join(__dirname, testFolder,file), 'utf8', function(err, data) {
           if (err) throw err;
         sql.push({name : file, sql: data});
         });
       });
+
       
   })
   return sql; 
@@ -71,6 +78,17 @@ app.get('/check_name', function(req, res, name) {
 		}
 	})
 });
+app.get('/identity', function(req, res){
+	//res.send(req.query.name+' -> '+req.query.xxx)
+	//res.send(req.query.xxx)
+	//names[req.query.socket] = req.query.name;
+		names.push(req.query.name);
+	res.send(names)
+	setTimeout(function(){
+
+	console.log(Object.keys(io.engine.clients))
+	},100)
+})
 app.use('/js', express.static(path.join(__dirname, 'js')))
 app.use('/css', express.static(path.join(__dirname, 'css')))
 app.use('/img', express.static(path.join(__dirname, 'img')))

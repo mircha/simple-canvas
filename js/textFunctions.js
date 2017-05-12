@@ -15,6 +15,14 @@ if(textDecoration1!='' && textDecoration2 !=''){
     textDecoration = textDecoration1;
   }
 }
+fontFamily = getFontStyle(font)
+  var text = new fabric.IText(label, {
+    id: j,fontFamily,fontWeight,fontStyle,textDecoration,fontSize,fill,stroke,originX: 'center',originY: 'center',left: 100,top: 100,
+  });
+  canvas.add(text)
+emitUpdate()
+}
+function getFontStyle(font){
   switch (font) {
     case 'times': fontFamily = 'Times New Roman, Times, serif'; break;
     case 'arial': fontFamily = 'Arial, Helvetica, sans-serif'; break;
@@ -22,11 +30,7 @@ if(textDecoration1!='' && textDecoration2 !=''){
     case 'comic': fontFamily = '"Comic Sans MS", cursive, sans-serif'; break;
     case 'courier': fontFamily = '"Courier New", Courier, monospace'; break;
   }
-  var text = new fabric.Text(label, {
-    id: j,fontFamily,fontWeight,fontStyle,textDecoration,fontSize,fill,stroke,originX: 'center',originY: 'center',left: 100,top: 100,
-  });
-  canvas.add(text)
-emitUpdate()
+  return fontFamily;
 }
 $(document).ready(function(){
 $("#textSizeSelect").on('change mousemove', function() {
@@ -56,6 +60,34 @@ $("#textSize").on('change keyup', function(){
   $(".font").on('click', function(){
     var id = $(this).attr('id');
     $('#textFont').val(id);
+
+    if(canvas.getActiveObject()){
+      var text = canvas.getActiveObject();
+      if(text.type=='i-text'){
+        text.fontFamily= getFontStyle(id);
+        canvas.renderAll();
+        canvas.trigger('object:modified', {target: text});
+      }
+    }
+  })
+canvas.on('mouse:up', function(e){
+  if(canvas.getActiveObject()){
+    if(e.target && e.target.type=='i-text'){
+      $("#textSize, #textSizeSelect").val(e.target.fontSize)
+    }
+  }
+})
+  $("#textSize, #textSizeSelect").on('change mousemove', function(){
+    var size = $(this).val();
+    console.log(size)
+      if(canvas.getActiveObject()){
+      var text = canvas.getActiveObject();
+      if(text.type=='i-text'){
+        text.fontSize= size;
+        canvas.renderAll();
+        canvas.trigger('object:modified', {target: text});
+      }
+    }
   })
   $("#textBold, #textItalic, #textUnderline, #textStrike").on('click', function(){
     $(this).toggleClass('active');

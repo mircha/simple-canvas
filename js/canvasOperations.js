@@ -101,6 +101,9 @@ $(document).ready(function() {
     canvas.freeDrawingBrush.color = $("#selectColor").val();
     strokeWidth = 1;
     canvas.freeDrawingBrush.width = strokeWidth;
+    arrow = false;
+    arrowStraight = false;
+    arrowQ= false;
   })
   $('#paint').on('click', function(){
     canvas.isDrawingMode=true;
@@ -109,9 +112,94 @@ $(document).ready(function() {
     canvas.freeDrawingBrush.width = strokeWidth;
     canvas.freeDrawingBrush.strokeLineJoin = 'bevil';
     canvas.freeDrawingBrush.strokeLineCap = 'round';
+    arrow = false;
+    arrowStraight = false;
+    arrowQ= false;
   })
-
   $('#noDraw').on('click', function(){
     canvas.isDrawingMode=false;
+    arrow = false;
+    arrowStraight = false;
+    arrowQ= false;
+  })
+  $('#drawArrow').on('click', function(){
+    arrow = true;
+    arrowStraight = false;
+    arrowQ= false;
+    canvas.freeDrawingBrush.width = 3;
+    canvas.isDrawingMode=true;
+  })
+  $('#drawArrowStraight').on('click', function(){
+    arrow = false;
+    arrowStraight = true;
+    arrowQ= false;
+    canvas.freeDrawingBrush.width = 3;
+    canvas.isDrawingMode=true;
+  })
+  $("#drawQuad").on('click', function(){
+    arrow = false;
+    arrowStraight = false;
+    arrowQ= true;
+    canvas.freeDrawingBrush.width = 3;
+    canvas.isDrawingMode=true;
+  })
+  $("body").on('click','#shadow', function(){
+    var blurval = parseInt($('#blur').val());
+    var offsetx = parseInt($("#offsetx").val());
+    var offsety = parseInt($("#offsety").val());
+    if(canvas.getActiveObject()){
+      obj = canvas.getActiveObject();
+        obj.setShadow({color: 'rgba(0,0,0, 0.5)',blur:blurval,offsetX:offsetx,offsetY:offsety});
+
+      canvas.renderAll();
+      canvas.trigger('object:modified', {target: obj});
+    }
+  })
+  $("body").on('click','#removeShadow', function(){
+    if(canvas.getActiveObject()){
+      obj = canvas.getActiveObject();
+      obj.setShadow(null)
+      canvas.renderAll();
+      canvas.trigger('object:modified', {target: obj});
+    }
+  })
+  canvas.on("object:selected", function(e){
+    if(canvas.getActiveObject()){
+      var obj = canvas.getActiveObject()
+      if(!obj.shadow){
+        console.log('no shadow')
+      }else{
+        $('#blur').val(obj.shadow.blur);
+        $("#offsetx").val(obj.shadow.offsetX);
+          $("#offsety").val(obj.shadow.offsetY);
+      }
+    }
+  })
+  $("body").on('click','#clockwise, #counterClockwise',function(e){
+    if(canvas.getActiveObject()){
+      if(e.target.id=='clockwise' || e.target.id=='cw'){
+        angle=-45;
+      }else{
+        angle=45;
+      }
+      var obj = canvas.getActiveObject();
+      var curAngle = obj.getAngle();
+      obj.setAngle(curAngle+angle);
+      canvas.renderAll();
+      canvas.trigger('object:modified', {target: obj});
+    }
+  })
+  $("body").on('click','#flipX, #flipY',function(e){
+    if(canvas.getActiveObject()){
+      if(e.target.id=='flipX' || e.target.id=='fx'){
+        flip='flipX';
+      }else{
+        flip='flipY';
+      }
+      var obj = canvas.getActiveObject();
+      obj.toggle(flip);
+      canvas.renderAll();
+      canvas.trigger('object:modified', {target: obj});
+    }
   })
 });

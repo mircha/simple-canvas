@@ -29,9 +29,25 @@ $(document).ready(function(){
 	            o.applyFilters(canvas.renderAll.bind(canvas));
 	  }
 	})
+	$('#removeFill').on('click', function(){
+	  var o = canvas.getActiveObject();
+	  var fill = '';
+		 if(o.type!=='image'){
+		    o.setFill (fill);
+		    canvas.renderAll();
+		    canvas.trigger('object:modified', {target: o});
+		}
+	})
 	$('#outline').on('click', function(){
 	  var o = canvas.getActiveObject();
 	  var stroke = $("#selectColor2").val();
+	  o.setStroke (stroke);
+	  canvas.renderAll();
+	  canvas.trigger('object:modified', {target: o});
+	})
+	$('#removeOutline').on('click', function(){
+	  var o = canvas.getActiveObject();
+	  var stroke = '';
 	  o.setStroke (stroke);
 	  canvas.renderAll();
 	  canvas.trigger('object:modified', {target: o});
