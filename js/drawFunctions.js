@@ -34,37 +34,9 @@ function rectangle(color,stroke, width, height){
 emitUpdate()
 }
 function addArrowHead( L, T, Lstart, Tstart, path, pivotx, pivoty){
-  var start = {x: pivotx, y: pivoty};
-  var end = {x: L, y: T};
-  var angleDeg = Math.atan2(end.y - start.y, end.x - start.x) * 180 / Math.PI;
-  var adj=90;
-  var centerX = (L + L) / 2,  centerY = (T + T) / 2;
-  var arrowx;
-  // deltaX = L - centerX,
-  // deltaY = T - centerY;
-        arrowx = new fabric.Triangle({
-            left: L /*+ deltaX*/,
-            top: T  /*+ deltaY*/,
-            originX: 'center',
-            originY: 'center',
-            hasBorders: false,
-            hasControls: false,
-            lockScalingX: true,
-            lockScalingY: true,
-            lockRotation: true,
-            pointType: 'arrow_start',
-            angle: angleDeg+adj,
-            width: 15,
-            height: 15,
-            fill: '#000'
-        });
-        canvas.add(arrowx);
-        var group = new fabric.Group([arrowx.clone(),path.path.clone()]);
-        canvas.add(group);
-        canvas.remove(arrowx);
-        canvas.remove(path.path);
-  canvas.renderAll()
-emitUpdate()
+  var angleDeg = calcDeg(pivotx, pivoty, L, T);
+  var line = path.path;
+  arrowToGroup(L,T,angleDeg, line)
 }
 function straightArrow(L, T, Lstart, Tstart, path){
   var pathP = `M ${Lstart} ${Tstart} L ${L} ${T}`;
@@ -73,36 +45,12 @@ function straightArrow(L, T, Lstart, Tstart, path){
     strokeWidth: 3,
     fill: ''
   })
-  canvas.add(line);//console.log(line)
+  canvas.add(line);
   var lineL = line.path[0][1];
   var lineT = line.path[0][2];
-
-  var start = {x: lineL, y: lineT};
-  var end = {x: L, y: T};
-  var angleDeg = Math.atan2(end.y - start.y, end.x - start.x) * 180 / Math.PI;
-          arrowx = new fabric.Triangle({
-            left: L /*+ deltaX*/,
-            top: T  /*+ deltaY*/,
-            originX: 'center',
-            originY: 'center',
-            hasBorders: false,
-            hasControls: false,
-            lockScalingX: true,
-            lockScalingY: true,
-            lockRotation: true,
-            pointType: 'arrow_start',
-            angle: angleDeg+90,
-            width: 15,
-            height: 15,
-            fill: '#000'
-        });
-  canvas.add(arrowx)
-  canvas.remove(path.path);
-        var group = new fabric.Group([arrowx.clone(),line.clone()]);
-        canvas.add(group);
-        canvas.remove(arrowx);
-        canvas.remove(line);
-  canvas.renderAll();
+  var angleDeg = calcDeg(lineL, lineT, L, T);
+        canvas.remove(path.path);
+        arrowToGroup(L,T,angleDeg, line)
 }
 function qArrow(L, T, Lstart, Tstart, path){
   var Lhalf = (L+Lstart)/2;
@@ -116,10 +64,8 @@ function qArrow(L, T, Lstart, Tstart, path){
   offsetT = -100;
  }
  offsetY = 0;
-  var start = {x: Lstart, y: Tstart};
-  var end = {x: L, y: T};
-  var angleDeg = Math.atan2(end.y - start.y, end.x - start.x) * 180 / Math.PI;
 
+ var angleDeg = calcDeg(Lstart, Tstart, L, T);
 if((angleDeg > 50 && angleDeg < 160) || (angleDeg <-50 && angleDeg > -105)){
   offsetY = 100;
 }
@@ -130,39 +76,57 @@ if(halfPathL < L && halfPathL < Lstart ){
     var line = new fabric.Path(pathP, {
     stroke: 'black',
     strokeWidth: 3,
+    //strokeDashArray: [15, 15],
     fill: ''
   })
     canvas.add(line);
-    
-    
-  var start = {x: path.path.path[path.path.path.length-10][1], y: path.path.path[path.path.path.length-10][2]};
-  var end = {x: L, y: T};
-  var angleDeg = Math.atan2(end.y - start.y, end.x - start.x) * 180 / Math.PI;
 
-canvas.remove(path.path);
-          arrowx = new fabric.Triangle({
-            left: L /*+ deltaX*/,
-            top: T  /*+ deltaY*/,
-            originX: 'center',
-            originY: 'center',
-            hasBorders: false,
-            hasControls: false,
-            lockScalingX: true,
-            lockScalingY: true,
-            lockRotation: true,
-            lockFill: true,
-            pointType: 'arrow_start',
-            angle: angleDeg+90,
-            width: 15,
-            height: 15,
-            fill: '#000'
-        });
-        canvas.add(arrowx)
-          var group = new fabric.Group([arrowx.clone(),line.clone()]);
-        canvas.add(group);
-        canvas.remove(arrowx);
-        canvas.remove(line);
+  var Lpath = path.path.path[path.path.path.length-10][1];
+  var Tpath = path.path.path[path.path.path.length-10][2];
+  var angleDeg = calcDeg(Lpath, Tpath, L, T)
+
+        canvas.remove(path.path);
+        arrowToGroup(L,T,angleDeg, line)
+}
+function calcDeg(x1,y1,x2,y2){
+  var start = {x: x1, y: y1};
+  var end = {x: x2, y: y2};
+  var angleDeg = Math.atan2(end.y - start.y, end.x - start.x) * 180 / Math.PI;
+  return angleDeg;
+}
+function arrowToGroup(L,T,angleDeg, line){
+  myArrow = new fabric.Triangle({
+    left: L /*+ deltaX*/,
+    top: T  /*+ deltaY*/,
+    originX: 'center',
+    originY: 'center',
+    hasBorders: false,
+    hasControls: false,
+    lockScalingX: true,
+    lockScalingY: true,
+    lockRotation: true,
+    pointType: 'arrow_start',
+    angle: angleDeg+90,
+    width: 15,
+    height: 15,
+    fill: '#000'
+});
+canvas.add(myArrow)
+  var group = new fabric.Group([myArrow.clone(),line.clone()]);
+  canvas.add(group);
+  canvas.remove(myArrow);
+  canvas.remove(line);
   canvas.renderAll();
+emitUpdate();
+}
+function loadPattern(url, obj){
+  fabric.util.loadImage(url, function(img) {
+  obj.setPatternFill({
+        source: img,
+        repeat: 'repeat'
+  });
+  canvas.renderAll();
+  });
 }
 function circle(fill, stroke){
   var circle = new fabric.Circle({
@@ -209,7 +173,7 @@ $(document).ready(function() {
     var color = '';
     var stroke = $("#selectColor2").val();
     rectangle(color,stroke,125,75);
-  })  
+  })
   $("#triangle").on('click', function(e) {
     var color = $("#selectColor").val();
     var stroke = $("#selectColor2").val();

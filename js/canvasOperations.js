@@ -163,9 +163,36 @@ $(document).ready(function() {
       canvas.trigger('object:modified', {target: obj});
     }
   })
+
+
   canvas.on("object:selected", function(e){
+
+    canvas.on("object:moving", function(e){
+      var obj = canvas.getActiveObject();
+      obj.opacity=0.7;
+    })
+
     if(canvas.getActiveObject()){
+
       var obj = canvas.getActiveObject()
+      var opacity = obj.opacity;
+      obj.on('deselected', function(){
+        obj.opacity=opacity;
+        canvas.trigger('object:modified', {target: obj});
+      })
+
+      if(obj.lockMovementX==true && obj.type!='text'){
+        var leftObj = obj.getLeft()-20;
+        var topObj = obj.getTop()-20;
+        var textLock = new fabric.Text('*', {left: leftObj, top: topObj, fill:'red', id: 'lock'});
+        textLock.toggle('lockScalingX').toggle('lockScalingY').toggle('lockRotation').toggle('lockMovementX').toggle('lockMovementY').toggle('selectable');
+        canvas.add(textLock)
+          obj.on('deselected', function(){
+            canvas.remove(textLock)
+          })
+
+      }
+
       if(!obj.shadow){
         console.log('no shadow')
       }else{
@@ -200,6 +227,16 @@ $(document).ready(function() {
       obj.toggle(flip);
       canvas.renderAll();
       canvas.trigger('object:modified', {target: obj});
+    }
+  })
+  $("#lock").on('click', function(){
+    if(canvas.getActiveObject()){
+      var obj = canvas.getActiveObject();
+      // lockScalingX: true,
+      // lockScalingY: true,
+      // lockRotation: true,
+      // lockMovementX = true;
+      obj.toggle('lockScalingX').toggle('lockScalingY').toggle('lockRotation').toggle('lockMovementX').toggle('lockMovementY')
     }
   })
 });

@@ -20,7 +20,8 @@
 
 <script type="text/javascript">
 var socketid='';
-var socket = io('http://192.168.0.114:3000');
+//var socket = io('http://192.168.0.114:3000');
+var socket = io('http://192.168.1.106:3000');
 //var socket = io('http://127.0.0.1:3000');
 var j=0;
 var k=0;
@@ -74,7 +75,7 @@ socket.on('updateCanvas', function(json, k){
 socket.on('resFiles', function(sql){
     var list = '<ul style="list-style-type:none; text-align:left">';
     for (i=0;i<sql.length;i++){
-      list +=`<li id="${i}" class="select-file">${sql[i].name}</li><input type="hidden" value="${sql[i].sql}" id="sql_${i}">` 
+      list +=`<li id="${i}" class="select-file">${sql[i].name}</li><input type="hidden" value="${sql[i].sql}" id="sql_${i}">`
     }
     list+='</ul>';
     $("#sqlFiles").html(list);
@@ -108,6 +109,7 @@ socket.on('resFiles', function(sql){
       <li><a href="#" style="font-size: 21px" id="clone" class="svg" data-toggle="tooltip" data-placement="bottom" title="Duplicate"><img src="img/clone.svg" style="width:21px; height:21px"/></a></li>
       <li><a href="#" style="font-size: 21px"  class="svg" data-placement="bottom" data-toggle="popover"><img src="img/square-shadow.svg" style="width:21px; height:21px"/></a></li>
       <li><a href="#" style="font-size: 21px"  class="svg" data-placement="bottom" data-toggle="popover2"><img src="img/rotate.svg" style="width:21px; height:21px"/></a></li>
+      <li><a href="#" style="font-size: 21px" id="lock" data-placement="bottom" data-toggle="tooltip" title="Lock/Unlock"><i class="fa fa-lock"></i></a></li>
   <li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li>
       <li><a href="#" style="font-size: 21px" id="help" data-toggle="tooltip" data-placement="bottom" title="Help"><i class="fa fa-question"></i></a></li>
     </ul>
@@ -212,7 +214,7 @@ socket.on('resFiles', function(sql){
 
 </div>
   <div class="col-md-3" style="float:left, text-align: center;">
-    
+
     <div style="float:left">
     <h5>Color Picker</h5>
       <label for="pickColor"><i class="glyphicon glyphicon-text-background" style="font-size:16px;vertical-align:middle"></i></label>
@@ -229,7 +231,7 @@ socket.on('resFiles', function(sql){
       <div class="col-md-6" style="margin-top: 4px">
       <button class="btn btn-default" id="fill" class="svg2"><img src="img/fill.svg" style="width: 21px; height:21px;" /></button>
       <button class="btn btn-default" id="outline"><img src="img/border.svg" style="width: 21px; height:21px;" /></button>
-      
+
       <button class="btn btn-default" id="removeFill"><img src="img/clear_background.svg" style="width: 21px; height:21px;" /></button>
       <button class="btn btn-default" id="removeOutline"><img src="img/clear_outline.svg" style="width: 21px; height:21px;" /></button>
       </div>
@@ -344,7 +346,7 @@ socket.on('resFiles', function(sql){
                 <input type="text" class="form-control" id="jsonName">
                 <span class="glyphicon form-control-feedback" id="jsonFeedback"></span>
               </div>
-              
+
             </div>
             <div class="modal-footer">
               <button class="btn btn-default disabled" disabled id="saveJson">Save</button>
@@ -431,18 +433,18 @@ function identify(name, socket){
   .always(function(data) {
     console.log(data);
   });
-  
+
 }
 
 $(document).ready(function(){
   $('[data-toggle="popover"]').popover({content: function () {
                                         return $('#shadowOptions').html();
-                                        }, 
+                                        },
                                         html: true,
                                       });
   $('[data-toggle="popover2"]').popover({content: function () {
                                         return $('#rotation').html();
-                                        }, 
+                                        },
                                         html: true,
                                       });
   $("#changelog").load('log/changelog.html')
@@ -458,7 +460,7 @@ $(document).ready(function(){
             $svg.attr('class', 'svg')
             // Replace image with new SVG
             $img.replaceWith($svg);
-        }, 'xml');   
+        }, 'xml');
   })
 })
 
@@ -466,14 +468,14 @@ $("body").on('mouseout',".svg", function(){
         var $img = jQuery(this).find('svg');
             $svg=$img;
             $svg.attr('fill', '#777')
-            $img.replaceWith($svg);  
+            $img.replaceWith($svg);
 })
 
 $("body").on('mouseover',".svg", function(){
         var $img = jQuery(this).find('svg');
             $svg=$img;
             $svg.attr('fill', 'black')
-            $img.replaceWith($svg);  
+            $img.replaceWith($svg);
 })
 
 $("body").on('click','.select-file', function(){
@@ -484,9 +486,9 @@ $("body").on('click','.select-file', function(){
   })
   .fail(function() {  console.log("error"); })
   .always(function(data) {
-      canvas.loadFromJSON(data, canvas.renderAll.bind(canvas)); 
+      canvas.loadFromJSON(data, canvas.renderAll.bind(canvas));
       $('#files').modal('hide');
-  });   
+  });
 })
 
 // create a wrapper around native canvas element (with id="c")
@@ -510,7 +512,7 @@ canvas.on('path:created', function(path) {
       pivot[2] = 0;
     }
 
-  addArrowHead(parseInt(end[1]), parseInt(end[2]),parseInt(start[1]), parseInt(start[2]), path, parseInt(pivot[1]), parseInt(pivot[2]),)
+  addArrowHead(parseInt(end[1]), parseInt(end[2]),parseInt(start[1]), parseInt(start[2]), path, parseInt(pivot[1]), parseInt(pivot[2]))
 
   }
   if(arrowStraight == true){

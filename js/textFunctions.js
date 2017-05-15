@@ -15,9 +15,18 @@ if(textDecoration1!='' && textDecoration2 !=''){
     textDecoration = textDecoration1;
   }
 }
-fontFamily = getFontStyle(font)
+fontFamily = getFontStyle(font);
+var leftObj;
+var topObj;
+if(canvas.getActiveObject()){
+  leftObj = canvas.getActiveObject().getLeft()+30;
+  topObj = canvas.getActiveObject().getTop()+25;
+}else{
+  leftObj = 100;
+  topObj = 100;
+}
   var text = new fabric.IText(label, {
-    id: j,fontFamily,fontWeight,fontStyle,textDecoration,fontSize,fill,stroke,originX: 'center',originY: 'center',left: 100,top: 100,
+    id: j,fontFamily,fontWeight,fontStyle,textDecoration,fontSize,fill,stroke,originX: 'center',originY: 'center',left: leftObj,top:topObj
   });
   canvas.add(text)
 emitUpdate()
