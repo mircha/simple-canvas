@@ -1,11 +1,24 @@
+<script type="text/javascript">
+function isElectron() {
+return (typeof process !== "undefined") && process.versions && (process.versions.electron !== undefined);
+}
+electron = isElectron();
+if(electron===true){
+  window.nodeRequire = require;
+  delete window.require;
+  delete window.exports;
+  delete window.module;
+}
+</script>
 <script src="js/jquery-3.2.1.min.js"></script>
 <script type="text/javascript" src="js/fabric1.7.11.min.js"></script>
 <script src="js/jscolor.min.js"></script>
 <script type="text/javascript" src="js/FileSaver.min.js"></script>
 <link rel="stylesheet" href="css/range.css">
+<link rel="stylesheet" href="css/contextMenu.css">
 <!--<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.9/fabric.min.js"></script>-->
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script><!--socketIO-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js" crossorigin="anonymous"></script><!--socketIO-->
 <script src="js/bootstrap.min.js"></script>
 
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -17,11 +30,12 @@
 <script type="text/javascript" src="js/canvasOperations.js"></script>
 <script type="text/javascript" src="js/colorPick.js"></script>
 <script type="text/javascript" src="js/topmenu.js"></script>
+<script type="text/javascript" src="js/shortKeys.js"></script>
 
 <script type="text/javascript">
 var socketid='';
-//var socket = io('http://192.168.0.114:3000');
-var socket = io('http://192.168.1.106:3000');
+var socket = io('http://192.168.0.114:3000');
+//var socket = io('http://192.168.1.106:3000');
 //var socket = io('http://127.0.0.1:3000');
 var j=0;
 var k=0;
@@ -92,7 +106,7 @@ socket.on('resFiles', function(sql){
 <nav class="navbar navbar-default" style="margin-bottom:5px">
   <div class="container-fluid">
     <div class="navbar-header">
-      <span class="navbar-brand" href="#">Whiteboard <small style="font-size:12px">v2.2_beta</small></span>
+      <span class="navbar-brand" href="#">Whiteboard <small style="font-size:12px">v2.5_beta</small></span>
     </div>
      <ul class="nav navbar-nav">
       <li><a href="#" style="font-size: 21px" id="save" data-toggle="tooltip" data-placement="bottom" title="Save&nbsp;image"><i class="fa fa-floppy-o"></i></a></li>
@@ -110,6 +124,11 @@ socket.on('resFiles', function(sql){
       <li><a href="#" style="font-size: 21px"  class="svg" data-placement="bottom" data-toggle="popover"><img src="img/square-shadow.svg" style="width:21px; height:21px"/></a></li>
       <li><a href="#" style="font-size: 21px"  class="svg" data-placement="bottom" data-toggle="popover2"><img src="img/rotate.svg" style="width:21px; height:21px"/></a></li>
       <li><a href="#" style="font-size: 21px" id="lock" data-placement="bottom" data-toggle="tooltip" title="Lock/Unlock"><i class="fa fa-lock"></i></a></li>
+      <li><a href="#" style="font-size: 21px" id="normalizeX" data-placement="bottom" data-toggle="tooltip" title="Lock/Unlock">X</a></li>
+      <li><a href="#" style="font-size: 21px" id="normalizeY" data-placement="bottom" data-toggle="tooltip" title="Lock/Unlock">Y</a></li>
+      <li><a href="#" style="font-size: 21px" id="normalizeW" data-placement="bottom" data-toggle="tooltip" title="Lock/Unlock">W</a></li>
+      <li><a href="#" style="font-size: 21px" id="normalizeH" data-placement="bottom" data-toggle="tooltip" title="Lock/Unlock">H</a></li>
+      <li><a href="#" style="font-size: 21px" id="serializeX" data-placement="bottom" data-toggle="tooltip" title="Lock/Unlock">...</a></li>
   <li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li>
       <li><a href="#" style="font-size: 21px" id="help" data-toggle="tooltip" data-placement="bottom" title="Help"><i class="fa fa-question"></i></a></li>
     </ul>
@@ -120,7 +139,7 @@ socket.on('resFiles', function(sql){
     </ul> -->
   </div>
 </nav>
-<div style="float:left;z-index:1000" id="viewport">
+<div style="float:left;z-index:998" id="viewport">
 
     <canvas id="myCanvas" width="1355" height="520" style="border:1px dotted black; margin-left:5px;">
       <p>This is fallback content
@@ -410,6 +429,38 @@ socket.on('resFiles', function(sql){
 &nbsp;
 </div>
 </div>
+
+
+<nav id="context-menu" style="display:none; z-index:999; position:absolute; background: #CCC; opacity: 0.9; padding:0; margin:0">
+  <ul class="context-menu__items" style="text-decoration: none; list-style-type: none;padding:5px; margin:0">
+    <li class="context-menu__item">
+      <a href="#" class="context-menu__link" id="menu_lock">
+        <i class="fa fa-lock"></i> Lock
+      </a>
+    </li>
+    <li class="context-menu__item">
+      <a href="#" class="context-menu__link" id="menu_duplicate">
+        <i class="fa fa-clone"></i> Duplicate
+      </a>
+    </li>
+    <li class="context-menu__item">
+      <a href="#" class="context-menu__link" id="menu_delete">
+        <i class="fa fa-times"></i> Delete
+      </a>
+    </li>
+    <li class="context-menu__item">
+      <a href="#" class="context-menu__link" id="menu_set">
+        <i class="fa fa-arrows"></i> Set Same <span class="caret"></span>
+      </a>
+      <ul id="setsame" style="display:none">
+        <li ><a href="#" class="context-menu__link" id="setX">Left</a></li>
+        <li id="setY">Top</li>
+        <li id="setW">Width</li>
+        <li id="setH">Height</li>
+      <ul>
+    </li>
+  </ul>
+</nav>
 </body>
   <script type="text/javascript">
   // Store the canvas object into a variable

@@ -164,23 +164,55 @@ $(document).ready(function() {
     }
   })
 
+    var collection =[];
 
   canvas.on("object:selected", function(e){
-
+var moved = false;
+/*
     canvas.on("object:moving", function(e){
-      var obj = canvas.getActiveObject();
-      obj.opacity=0.7;
+      moved = true;
+      if(canvas.getActiveObject()){
+        var obj = canvas.getActiveObject();
+        obj.opacity=0.7;
+      }
+      if(canvas.getActiveGroup()){
+        var group = canvas.getActiveGroup();
+        group.opacity=0.7;
+      }
     })
-
+*/
     if(canvas.getActiveObject()){
+      collection[0] = canvas.getActiveObject();
 
       var obj = canvas.getActiveObject()
       var opacity = obj.opacity;
-      obj.on('deselected', function(){
-        obj.opacity=opacity;
-        canvas.trigger('object:modified', {target: obj});
-      })
-
+        //  obj.on('deselected', function(){
+        //   obj.opacity=1;
+        //   if(moved){
+        //     canvas.trigger('object:modified', {target: obj});
+        //     moved = false;
+        //   }
+        // })
+      /*
+      canvas.on('mouse:up', function(){
+        
+        if(canvas.getActiveObject()){
+          var obj = canvas.getActiveObject();
+          obj.set({opacity: opacity});
+          if(moved){
+            //canvas.trigger('object:modified', {target: obj});
+            emitUpdate();
+            moved = false;
+          }
+          canvas.renderAll();
+        }
+        if(canvas.getActiveGroup()){
+          var group = canvas.getActiveGroup();
+          group.set({opacity: opacity});
+          canvas.renderAll();
+        }
+      });
+*/
       if(obj.lockMovementX==true && obj.type!='text'){
         var leftObj = obj.getLeft()-20;
         var topObj = obj.getTop()-20;
@@ -194,11 +226,11 @@ $(document).ready(function() {
       }
 
       if(!obj.shadow){
-        console.log('no shadow')
+        //console.log('no shadow')
       }else{
         $('#blur').val(obj.shadow.blur);
         $("#offsetx").val(obj.shadow.offsetX);
-          $("#offsety").val(obj.shadow.offsetY);
+        $("#offsety").val(obj.shadow.offsetY);
       }
     }
   })
@@ -237,6 +269,111 @@ $(document).ready(function() {
       // lockRotation: true,
       // lockMovementX = true;
       obj.toggle('lockScalingX').toggle('lockScalingY').toggle('lockRotation').toggle('lockMovementX').toggle('lockMovementY')
+    }
+  })
+  $("#normalizeX").on('click', function(){
+    var coord = 'left';
+    if(canvas.getActiveGroup()){
+        var group = canvas.getActiveGroup();
+        if(collection[0]){
+            group.forEachObject(function(obj){
+              obj.left = collection[0].left
+            })
+        }else{
+            group.forEachObject(function(obj){
+              obj.left = group.item(0).left
+            })
+      }
+      canvas.renderAll();
+      emitUpdate();
+    }
+  })
+  $("#normalizeY").on('click', function(){
+    if(canvas.getActiveGroup()){
+        var group = canvas.getActiveGroup();
+        if(collection[0]){
+            group.forEachObject(function(obj){
+              obj.top = collection[0].top
+            })
+        }else{
+            group.forEachObject(function(obj){
+              obj.top = group.item(0).top
+            })
+      }
+      canvas.renderAll();
+      emitUpdate();
+    }
+  })
+  $("#normalizeW").on('click', function(){
+    if(canvas.getActiveGroup()){
+        var group = canvas.getActiveGroup();
+        if(collection[0]){
+            group.forEachObject(function(obj){
+              obj.width = collection[0].width
+              obj.scaleX = collection[0].scaleX
+            })
+        }else{
+            group.forEachObject(function(obj){
+              obj.scaleX = group.item(0).scaleX
+              obj.width = group.item(0).width
+            })
+      }
+      canvas.renderAll();
+      emitUpdate();
+    }
+  })
+  $("#normalizeH").on('click', function(){
+    if(canvas.getActiveGroup()){
+        var group = canvas.getActiveGroup();
+        if(collection[0]){
+            group.forEachObject(function(obj){
+              obj.height = collection[0].height
+              obj.scaleY = collection[0].scaleY
+            })
+        }else{
+            group.forEachObject(function(obj){
+              obj.height = group.item(0).height
+              obj.scaleY = group.item(0).scaleY
+            })
+      }
+      canvas.renderAll();
+      emitUpdate();
+    }
+  })
+  $("#serializeX").on('click', function(){
+    if(canvas.getActiveGroup()){
+        var group = canvas.getActiveGroup();
+        group.left = 10;
+        group.originX = 'center';
+        group.originY = 'top'
+        var k=0;
+        var offset=0;
+        // if(collection[0]){
+        //     group.forEachObject(function(obj){
+        //       if(k==1){
+        //         offset += collection[0].width+25
+        //         obj.offset = collection[0].width+25
+                
+        //       }else{
+        //       offset += (parseInt(group.item(k-2).width)+25)
+        //       obj.left = offset;
+        //       }
+        //       obj.top = group.item(0).top
+        //       k++;
+        //       console.log(obj.left)
+        //     })
+        // }else{
+            group.forEachObject(function(obj){
+              obj.left = offset;
+              offset += (parseInt(group.item(k).width*group.item(k).scaleX+25))
+              console.log(offset)
+              k++;
+              obj.top = group.item(0).top;
+            })
+      // }
+      group.left = 10;
+      canvas.renderAll();
+      emitUpdate();
     }
   })
 });

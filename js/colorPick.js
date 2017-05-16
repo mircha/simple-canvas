@@ -27,6 +27,7 @@ $(document).ready(function(){
 	                color: fill,
 	            }));
 	            o.applyFilters(canvas.renderAll.bind(canvas));
+	            canvas.trigger('object:modified', {target: o});
 	  }
 	})
 	$('#removeFill').on('click', function(){

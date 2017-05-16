@@ -2,6 +2,7 @@ function addImg(myImg){
     fabric.Image.fromURL(myImg, function(oImg) {
       if(myImg=='img/arrow.svg') {alert('a')}
         oImg.set('id', parseInt(j));
+        oImg.crossOrigin = "Anonymous"
         oImg.scale(0.3);
 
         if(myImg=='img/server2.svg' || myImg=='img/laptop.svg' || myImg=='img/news.svg' || myImg=='img/cloud.svg' || myImg=='img/chat.svg'){
@@ -28,7 +29,7 @@ function tops(){
 }
 function rectangle(color,stroke, width, height){
   var rect = new fabric.Rect({
-    id: j,left: left(),top: tops(),fill: color,stroke: stroke,width: width,height: height,
+    id: j,left: left(),top: tops(),fill: color,stroke: stroke,width: width,height: height,originX:'left', originY:'top'
   });
   canvas.add(rect);
 emitUpdate()
@@ -130,14 +131,14 @@ function loadPattern(url, obj){
 }
 function circle(fill, stroke){
   var circle = new fabric.Circle({
-    id:j,radius: 30, fill, left: left(), top: tops(), stroke
+    id:j,radius: 30, fill, left: left(), top: tops(), stroke,originX:'left', originY:'top'
   });
   canvas.add(circle)
 emitUpdate()
 }
 function triangle(fill, stroke){
   var triangle = new fabric.Triangle({
-    id:j,width: 50, height: 50, fill, left: left(), top: tops(), stroke
+    id:j,width: 50, height: 50, fill, left: left(), top: tops(), stroke,originX:'left', originY:'top'
   });
   canvas.add(triangle)
 emitUpdate()

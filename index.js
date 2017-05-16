@@ -59,10 +59,10 @@ function loadQuery(sql){
   })
   return sql; 
 }
-
 app.use(express.static('/'))
-app.get('/', function(req, res) {
-    res.sendFile(path.join(__dirname + '/index.html'));
+app.get('/', function(req, res){
+  res.header("Access-Control-Allow-Origin", "*");
+  res.sendFile(__dirname + '/index.html');
 });
 
 app.get('/check_name', function(req, res, name) {
