@@ -64,11 +64,8 @@ $(document).ready(function() {
   $("#back").on('click', function(){
       var activeObject = canvas.getActiveObject(),
           activeGroup = canvas.getActiveGroup();
-    // canvas.sendBackwards(myObject)
     canvas.sendToBack(activeObject)
     emitUpdate()
-    // canvas.bringForward(myObject)
-    //canvas.bringToFront(activeObject)
   })
   $("#clone").on('click', function(){
     var group;
@@ -150,7 +147,6 @@ $(document).ready(function() {
     if(canvas.getActiveObject()){
       obj = canvas.getActiveObject();
         obj.setShadow({color: 'rgba(0,0,0, 0.5)',blur:blurval,offsetX:offsetx,offsetY:offsety});
-
       canvas.renderAll();
       canvas.trigger('object:modified', {target: obj});
     }
@@ -164,11 +160,22 @@ $(document).ready(function() {
     }
   })
 
-    var collection =[];
+canvas.on("object:moving", function(e){
+  if(canvas.getActiveObject()){
+    canvas.getActiveObject().opacity = 0.5;
+  }
+})
+canvas.on("mouse:up", function(e){
+  if(canvas.getActiveObject()){
+    obj = canvas.getActiveGroup();
+    canvas.getActiveObject().opacity = 1;
+    canvas.trigger('object:modified', {target: obj});
+  }
+})
 
+  var collection =[];
   canvas.on("object:selected", function(e){
-var moved = false;
-/*
+/*  var moved = false;
     canvas.on("object:moving", function(e){
       moved = true;
       if(canvas.getActiveObject()){
@@ -181,9 +188,9 @@ var moved = false;
       }
     })
 */
+
     if(canvas.getActiveObject()){
       collection[0] = canvas.getActiveObject();
-
       var obj = canvas.getActiveObject()
       var opacity = obj.opacity;
         //  obj.on('deselected', function(){
@@ -195,7 +202,7 @@ var moved = false;
         // })
       /*
       canvas.on('mouse:up', function(){
-        
+
         if(canvas.getActiveObject()){
           var obj = canvas.getActiveObject();
           obj.set({opacity: opacity});
@@ -213,18 +220,16 @@ var moved = false;
         }
       });
 */
-      if(obj.lockMovementX==true && obj.type!='text'){
-        var leftObj = obj.getLeft()-20;
-        var topObj = obj.getTop()-20;
-        var textLock = new fabric.Text('*', {left: leftObj, top: topObj, fill:'red', id: 'lock'});
-        textLock.toggle('lockScalingX').toggle('lockScalingY').toggle('lockRotation').toggle('lockMovementX').toggle('lockMovementY').toggle('selectable');
-        canvas.add(textLock)
-          obj.on('deselected', function(){
-            canvas.remove(textLock)
-          })
-
-      }
-
+    if(obj.lockMovementX==true && obj.type!='text'){
+      var leftObj = obj.getLeft()-20;
+      var topObj = obj.getTop()-20;
+      var textLock = new fabric.Text('*', {left: leftObj, top: topObj, fill:'red', id: 'lock'});
+      textLock.toggle('lockScalingX').toggle('lockScalingY').toggle('lockRotation').toggle('lockMovementX').toggle('lockMovementY').toggle('selectable');
+      canvas.add(textLock)
+        obj.on('deselected', function(){
+          canvas.remove(textLock)
+        })
+    }
       if(!obj.shadow){
         //console.log('no shadow')
       }else{
@@ -264,15 +269,11 @@ var moved = false;
   $("#lock").on('click', function(){
     if(canvas.getActiveObject()){
       var obj = canvas.getActiveObject();
-      // lockScalingX: true,
-      // lockScalingY: true,
-      // lockRotation: true,
-      // lockMovementX = true;
+      // {lockScalingX: true,lockScalingY: true,lockRotation: true,lockMovementX = true;}
       obj.toggle('lockScalingX').toggle('lockScalingY').toggle('lockRotation').toggle('lockMovementX').toggle('lockMovementY')
     }
   })
-  $("#normalizeX").on('click', function(){
-    var coord = 'left';
+  $('body').on('click',"#normalizeX", function(){
     if(canvas.getActiveGroup()){
         var group = canvas.getActiveGroup();
         if(collection[0]){
@@ -280,15 +281,15 @@ var moved = false;
               obj.left = collection[0].left
             })
         }else{
-            group.forEachObject(function(obj){
-              obj.left = group.item(0).left
-            })
-      }
+              group.forEachObject(function(obj){
+                obj.left = group.item(0).left
+              })
+            }
       canvas.renderAll();
       emitUpdate();
     }
   })
-  $("#normalizeY").on('click', function(){
+  $('body').on('click', "#normalizeY",function(){
     if(canvas.getActiveGroup()){
         var group = canvas.getActiveGroup();
         if(collection[0]){
@@ -304,7 +305,7 @@ var moved = false;
       emitUpdate();
     }
   })
-  $("#normalizeW").on('click', function(){
+  $('body').on('click',"#normalizeW", function(){
     if(canvas.getActiveGroup()){
         var group = canvas.getActiveGroup();
         if(collection[0]){
@@ -322,7 +323,7 @@ var moved = false;
       emitUpdate();
     }
   })
-  $("#normalizeH").on('click', function(){
+  $('body').on('click',"#normalizeH", function(){
     if(canvas.getActiveGroup()){
         var group = canvas.getActiveGroup();
         if(collection[0]){
@@ -340,7 +341,7 @@ var moved = false;
       emitUpdate();
     }
   })
-  $("#serializeX").on('click', function(){
+  $("body").on('click','#serializeX', function(){
     if(canvas.getActiveGroup()){
         var group = canvas.getActiveGroup();
         group.left = 10;
@@ -353,7 +354,7 @@ var moved = false;
         //       if(k==1){
         //         offset += collection[0].width+25
         //         obj.offset = collection[0].width+25
-                
+
         //       }else{
         //       offset += (parseInt(group.item(k-2).width)+25)
         //       obj.left = offset;
@@ -376,4 +377,96 @@ var moved = false;
       emitUpdate();
     }
   })
+  $("body").on('click','#serializeY', function(){
+    if(canvas.getActiveGroup()){
+        var group = canvas.getActiveGroup();
+        group.top = 10;
+        group.originX = 'center';
+        group.originY = 'top'
+        var k=0;
+        var offset=0;
+            group.forEachObject(function(obj){
+              obj.top = offset;
+              offset += (parseInt(group.item(k).height*group.item(k).scaleY+25))
+              console.log(offset)
+              k++;
+              obj.left = group.item(0).left;
+            })
+      group.top = 10;
+      canvas.renderAll();
+      emitUpdate();
+    }
+  })
+  var dbcheck = false;
+  var arrowcheck1 = true;
+  var arrowcheck2 = true;
+  var p1 = {x:0, y:0};
+  var p2 = {x:0, y: 0};
+  var px = [];
+  var py = [];
+  var quad = '';
+  fabric.util.addListener(canvas.upperCanvasEl, 'dblclick', function (e) {
+    var target = canvas.findTarget(e);
+    var pointer = canvas.getPointer(event.e);
+    
+    canvas.on('mouse:down', function(e){
+      if(dbcheck == true){
+      
+        px.push(canvas.getPointer(event.e).x);
+        py.push(canvas.getPointer(event.e).y);
+        //px.push(p1);
+      }
+    })
+    if(dbcheck == false){
+      if(!target){
+        arrowcheck1 = false;
+      }
+      // p1 = target.getCenterPoint();
+       p1.x = pointer.x;
+       p1.y = pointer.y;
+      dbcheck = true;
+    }else{
+      if(!target){
+        arrowcheck2 = false;
+      }
+       //p2 = target.getCenterPoint();
+       p2.x = pointer.x;
+       p2.y = pointer.y;
+      dbcheck = true;
+
+      for (cc=1; cc<px.length-2;cc++){
+        quad +=`Q ${px[cc]}, ${py[cc]} `;
+      }
+      pathx = `M ${p1.x} ${p1.y} ${quad}  ${p2.x} ${p2.y}`
+      var newLine = new fabric.Path(pathx, {
+        stroke: 'black',
+        strokeWidth: 2,
+        //originX:'right',
+        //originY: 'bottom',
+        //strokeDashArray: [5, 5],
+        fill: ''
+      })
+      canvas.add(newLine)
+      // if(arrowcheck1 && arrowcheck2){
+      //   var angleDeg = calcDeg(p1.x, p2.x, p1.y, p2.y)
+      //   arrowToGroup(p2.x,p2.y,Math.ceil(angleDeg), newLine)
+      // }
+      if(arrowcheck1 && arrowcheck2){
+        straightArrow(p2.x,p2.y,p1.x,p1.y, newLine)
+        canvas.remove(newLine)
+      }else{
+        if(arrowcheck1 && px.length>3){
+        quadArrow(quad, px[px.length-3], py[py.length-3], px[px.length-1], py[py.length-1], newLine)
+        }
+      }
+      
+      dbcheck = false;
+      arrowcheck1 = true;
+      arrowcheck2 = true;
+      canvas.off('mouse:down')
+      px.length=0;
+      py = [];
+      quad = '';
+    }
+  });
 });

@@ -34,9 +34,9 @@ if(electron===true){
 
 <script type="text/javascript">
 var socketid='';
-var socket = io('http://192.168.0.114:3000');
+//var socket = io('http://192.168.0.114:3000');
 //var socket = io('http://192.168.1.106:3000');
-//var socket = io('http://127.0.0.1:3000');
+var socket = io('http://127.0.0.1:3000');
 var j=0;
 var k=0;
 var modified = true;
@@ -124,19 +124,12 @@ socket.on('resFiles', function(sql){
       <li><a href="#" style="font-size: 21px"  class="svg" data-placement="bottom" data-toggle="popover"><img src="img/square-shadow.svg" style="width:21px; height:21px"/></a></li>
       <li><a href="#" style="font-size: 21px"  class="svg" data-placement="bottom" data-toggle="popover2"><img src="img/rotate.svg" style="width:21px; height:21px"/></a></li>
       <li><a href="#" style="font-size: 21px" id="lock" data-placement="bottom" data-toggle="tooltip" title="Lock/Unlock"><i class="fa fa-lock"></i></a></li>
-      <li><a href="#" style="font-size: 21px" id="normalizeX" data-placement="bottom" data-toggle="tooltip" title="Lock/Unlock">X</a></li>
-      <li><a href="#" style="font-size: 21px" id="normalizeY" data-placement="bottom" data-toggle="tooltip" title="Lock/Unlock">Y</a></li>
-      <li><a href="#" style="font-size: 21px" id="normalizeW" data-placement="bottom" data-toggle="tooltip" title="Lock/Unlock">W</a></li>
-      <li><a href="#" style="font-size: 21px" id="normalizeH" data-placement="bottom" data-toggle="tooltip" title="Lock/Unlock">H</a></li>
-      <li><a href="#" style="font-size: 21px" id="serializeX" data-placement="bottom" data-toggle="tooltip" title="Lock/Unlock">...</a></li>
-  <li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li>
-      <li><a href="#" style="font-size: 21px" id="help" data-toggle="tooltip" data-placement="bottom" title="Help"><i class="fa fa-question"></i></a></li>
+      <li><a href="#" style="font-size: 21px" id="placement" data-placement="bottom" data-toggle="popover3"><i class="fa fa-arrows"></i></a></li>
     </ul>
 
-  <!--     <ul class="nav navbar-nav navbar-right">
-      <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
-      <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
-    </ul> -->
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="#" style="font-size: 21px" id="help" data-toggle="tooltip" data-placement="bottom" title="Help"><i class="fa fa-question"></i></a></li>
+    </ul>
   </div>
 </nav>
 <div style="float:left;z-index:998" id="viewport">
@@ -226,11 +219,9 @@ socket.on('resFiles', function(sql){
               </li>
           </ul>
       </div>
-
          <button id="noDraw" type = "button" class = "btn btn-default">
             <img src="img/select.svg" style="width: 23px; height:23px;" />
          </button>
-
 </div>
   <div class="col-md-3" style="float:left, text-align: center;">
 
@@ -250,7 +241,6 @@ socket.on('resFiles', function(sql){
       <div class="col-md-6" style="margin-top: 4px">
       <button class="btn btn-default" id="fill" class="svg2"><img src="img/fill.svg" style="width: 21px; height:21px;" /></button>
       <button class="btn btn-default" id="outline"><img src="img/border.svg" style="width: 21px; height:21px;" /></button>
-
       <button class="btn btn-default" id="removeFill"><img src="img/clear_background.svg" style="width: 21px; height:21px;" /></button>
       <button class="btn btn-default" id="removeOutline"><img src="img/clear_outline.svg" style="width: 21px; height:21px;" /></button>
       </div>
@@ -296,7 +286,6 @@ socket.on('resFiles', function(sql){
 
 <div id="helpPage" class="carousel slide" data-ride="carousel" data-interval="false" style="display: none; width:1300px;height:540px; z-index:9999; margin:0 auto; text-align:center!important">
   <!-- Indicators -->
-
   <!-- Wrapper for slides -->
   <div class="carousel-inner" style="">
     <div class="item active">
@@ -429,7 +418,21 @@ socket.on('resFiles', function(sql){
 &nbsp;
 </div>
 </div>
-
+<div id="placementOptions" class="hide">
+<div class="btn-group center-block col-md-12">
+  <a href="#" class="btn btn-default" id="normalizeX">X</a>
+  <button class="btn btn-default" id="normalizeY">Y</button>
+  <button class="btn btn-default" id="normalizeW">W</button>
+  <button class="btn btn-default" id="normalizeH">H</button>
+</div>
+<div class="btn-group center-block col-md-12">
+  <button class="btn btn-default" id="serializeX"><i class="glyphicon glyphicon-option-horizontal"></i></button>
+  <button class="btn btn-default" id="serializeY"><i class="glyphicon glyphicon-option-vertical"></i></button>
+</div>
+<div class="form-group" style="width:190px!important; text-align:center; vertical-align:middle; font-size:10px; max-height:20px!important; height:auto">
+&nbsp;
+</div>
+</div>
 
 <nav id="context-menu" style="display:none; z-index:999; position:absolute; background: #CCC; opacity: 0.9; padding:0; margin:0">
   <ul class="context-menu__items" style="text-decoration: none; list-style-type: none;padding:5px; margin:0">
@@ -453,10 +456,10 @@ socket.on('resFiles', function(sql){
         <i class="fa fa-arrows"></i> Set Same <span class="caret"></span>
       </a>
       <ul id="setsame" style="display:none">
-        <li ><a href="#" class="context-menu__link" id="setX">Left</a></li>
-        <li id="setY">Top</li>
-        <li id="setW">Width</li>
-        <li id="setH">Height</li>
+        <li><a href="#" class="context-menu__link" id="setX">Left</a></li>
+        <li><a href="#" class="context-menu__link" id="setY">Top</a></li>
+        <li><a href="#" class="context-menu__link" id="setW">Width</a></li>
+        <li><a href="#" class="context-menu__link" id="setH">Height</a></li>
       <ul>
     </li>
   </ul>
@@ -498,6 +501,11 @@ $(document).ready(function(){
                                         },
                                         html: true,
                                       });
+$('[data-toggle="popover3"]').popover({content: function () {
+                                      return $('#placementOptions').html();
+                                      },
+                                      html: true,
+                                    });
   $("#changelog").load('log/changelog.html')
   $('[data-toggle="tooltip"]').tooltip({'delay': { show: 1000, hide: 150 }});
   $(".svg").each(function(){

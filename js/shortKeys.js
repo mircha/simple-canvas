@@ -1,33 +1,28 @@
 function handleContextMenu(e){
-  // tell the browser we're handling this event
   e.preventDefault();
-  //e.stopPropagation();
-
   // get mouse position relative to the canvas
   var x=parseInt(e.pageX);
   var y=parseInt(e.pageY);
-
   // hide the context menu
   showContextMenu(x,y);
   return(false);
 }
 function showContextMenu(x,y){
-if(canvas.getActiveObject() || canvas.getActiveGroup()){
-  $('#context-menu').css({'top': y, 'left':x});
-  $('#context-menu').show();
+  if(canvas.getActiveObject() || canvas.getActiveGroup()){
+    $('#context-menu').css({'top': y, 'left':x});
+    $('#context-menu').show();
+  }
 }
-}
-
 function update(obj){
         	canvas.renderAll();
-        	canvas.trigger('object:modified', {target: obj});	
+        	canvas.trigger('object:modified', {target: obj});
 }
 $(document).ready(function(){
 canvas.on('mouse:down', function(){
 	$('#context-menu').hide();
 	$('#setsame').hide();
 })
-	document.addEventListener('contextmenu', handleContextMenu, false); 
+	document.addEventListener('contextmenu', handleContextMenu, false);
     $(document).keydown(function(e) {
     	if(e.keyCode == 82 && e.ctrlKey){
 
@@ -36,16 +31,13 @@ canvas.on('mouse:down', function(){
     	}
     	var obj = canvas.getActiveObject();
         if (e.keyCode == 49 && e.ctrlKey) {
-            //alert('ctrl 1');
             $("#rectangle").trigger('click');
         }
         if (e.keyCode == 50 && e.ctrlKey) {
-            //alert('ctrl 1');
             $("#circle").trigger('click');
         }
         if (e.keyCode == 46 && e.ctrlKey) {
             $("#removeMany").trigger('click');
-
         }
         if (e.keyCode == 68 && e.ctrlKey && obj) {
         	e.preventDefault();

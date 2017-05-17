@@ -35,7 +35,6 @@ $(document).ready(function(){
 	$("#saveJson").on('click', function(){
 	  var name = $("#jsonName").val()
 	  var json = JSON.stringify(canvas.toJSON(["lockMovementX", "lockMovementY","lockScalingX", "lockScalingY", "lockRotation", "selectable"]));
-	 // var json = JSON.stringify(["lockMovementX", "lockMovementY","lockScalingX", "lockScalingY", "lockRotation"]);
 	  socket.emit('saveToJSON', json, name);
 	  $("#jsonName").val('');
 	  $(this).addClass('disabled').attr('disabled', true)

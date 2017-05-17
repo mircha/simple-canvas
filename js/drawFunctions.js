@@ -2,7 +2,7 @@ function addImg(myImg){
     fabric.Image.fromURL(myImg, function(oImg) {
       if(myImg=='img/arrow.svg') {alert('a')}
         oImg.set('id', parseInt(j));
-        oImg.crossOrigin = "Anonymous"
+        oImg.crossOrigin = "Anonymous";
         oImg.scale(0.3);
 
         if(myImg=='img/server2.svg' || myImg=='img/laptop.svg' || myImg=='img/news.svg' || myImg=='img/cloud.svg' || myImg=='img/chat.svg'){
@@ -53,6 +53,19 @@ function straightArrow(L, T, Lstart, Tstart, path){
         canvas.remove(path.path);
         arrowToGroup(L,T,angleDeg, line)
 }
+
+function quadArrow(quad, x1,y1,x2,y2, path){
+   console.log(quad, path)
+   var L = path.path[1][3];
+   var T = path.path[1][4];
+   console.log(x1, y1)
+
+  var angleDeg = calcDeg(x1, y1, L, T);
+   //canvas.remove(path);
+   console.log(angleDeg)
+        arrowToGroup(L,T,angleDeg, path)
+}
+
 function qArrow(L, T, Lstart, Tstart, path){
   var Lhalf = (L+Lstart)/2;
   var halfPath = parseInt(path.path.path.length/2);
@@ -84,7 +97,8 @@ if(halfPathL < L && halfPathL < Lstart ){
 
   var Lpath = path.path.path[path.path.path.length-10][1];
   var Tpath = path.path.path[path.path.path.length-10][2];
-  var angleDeg = calcDeg(Lpath, Tpath, L, T)
+  //var angleDeg = calcDeg(Lpath, Tpath, L, T)
+  var angleDeg = calcDeg(halfPathL, halfPathT, L, T)
 
         canvas.remove(path.path);
         arrowToGroup(L,T,angleDeg, line)
@@ -100,7 +114,7 @@ function arrowToGroup(L,T,angleDeg, line){
     left: L /*+ deltaX*/,
     top: T  /*+ deltaY*/,
     originX: 'center',
-    originY: 'center',
+    originY: 'bottom',
     hasBorders: false,
     hasControls: false,
     lockScalingX: true,
@@ -144,7 +158,6 @@ function triangle(fill, stroke){
 emitUpdate()
 }
 $(document).ready(function() {
-
   $("#addServer").on('click', function(e) { addImg(serverImg);  })
   $("#addServers").on('click', function(e) {  addImg(serversImg); })
   $("#addLib").on('click', function(e) {  addImg(libImg); })
