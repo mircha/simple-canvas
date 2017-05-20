@@ -36,6 +36,7 @@ if(electron===true){
 var socketid='';
 //var socket = io('http://192.168.0.114:3000');
 //var socket = io('http://192.168.1.106:3000');
+//var socket = io('http://10.101.206.47:3000');
 var socket = io('http://127.0.0.1:3000');
 var j=0;
 var k=0;
@@ -106,7 +107,7 @@ socket.on('resFiles', function(sql){
 <nav class="navbar navbar-default" style="margin-bottom:5px">
   <div class="container-fluid">
     <div class="navbar-header">
-      <span class="navbar-brand" href="#">Whiteboard <small style="font-size:12px">v2.5_beta</small></span>
+      <span class="navbar-brand" href="#">Whiteboard <small style="font-size:12px">v3_beta</small></span>
     </div>
      <ul class="nav navbar-nav">
       <li><a href="#" style="font-size: 21px" id="save" data-toggle="tooltip" data-placement="bottom" title="Save&nbsp;image"><i class="fa fa-floppy-o"></i></a></li>
@@ -506,7 +507,12 @@ $('[data-toggle="popover3"]').popover({content: function () {
                                       },
                                       html: true,
                                     });
-  $("#changelog").load('log/changelog.html')
+  if(!electron){
+    $("#changelog").load('log/changelog.html')
+  }
+  if(electron){
+    $("#accordion").hide();
+  }
   $('[data-toggle="tooltip"]').tooltip({'delay': { show: 1000, hide: 150 }});
   $(".svg").each(function(){
         var $img = jQuery(this).find('img');

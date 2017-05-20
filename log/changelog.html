@@ -1,6 +1,27 @@
+<script type="text/javascript">
+const remote = require('electron').remote;
+function isElectron() {
+return (typeof process !== "undefined") && process.versions && (process.versions.electron !== undefined);
+}
+electron = isElectron();
+  if(electron === true){
+  
+  document.addEventListener("DOMContentLoaded", function(event) { 
+    document.getElementById("close-btn").style.display = 'block';
+     document.getElementById("close-btn").addEventListener("click", function (e) {
+         var window = remote.getCurrentWindow();
+         window.close();
+    });
+  });
+}
+</script>
+<button id="close-btn" style="display:none">Close</button>
+<h3>Current version: 3 beta</h3>
+<h3>Last updated: 18 May 2017</h3>
 <p>
   <u>May 17, 2017 - v3_beta</u>
   <ul>
+    <li> Created Whiteboard app</li>
     <li> Draw line on double click -> draw quad if clicks between doubleclicks</li>
     <li> Draw line on double click -> draw quad with arrows if on first double click object is selected and clicks are added on double clicks</li>
   </ul>
