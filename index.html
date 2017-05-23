@@ -73,7 +73,7 @@ socket.on('connect', function () {
   });
   setTimeout(function(){
     if(socketid){
-      identify('gigel');
+      //identify('gigel');
     }
   },1000)
   socket.on('clearCanvas',function(){
@@ -104,28 +104,36 @@ socket.on('resFiles', function(sql){
 </head>
 <body>
 <div id="content">
-<nav class="navbar navbar-default" style="margin-bottom:5px">
+<nav class="navbar navbar-default" style="padding:0;margin-bottom:5px; height:15px!important; max-height:15px!important;">
   <div class="container-fluid">
     <div class="navbar-header">
-      <span class="navbar-brand" href="#">Whiteboard <small style="font-size:12px">v3_beta</small></span>
+      <span class="navbar-brand" href="#">Whiteboard <small style="font-size:12px" id="cversion"></small></span>
     </div>
      <ul class="nav navbar-nav">
-      <li><a href="#" style="font-size: 21px" id="save" data-toggle="tooltip" data-placement="bottom" title="Save&nbsp;image"><i class="fa fa-floppy-o"></i></a></li>
-      <li><a href="#" style="font-size: 21px" id="svg" class="svg" data-toggle="tooltip" data-placement="bottom" title="Save&nbsp;JSON"><img src="img/laptop-code.svg" style="width:21px; height:21px"/></a></li>
-      <li><a href="#" style="font-size: 21px" id="loadJson" data-toggle="tooltip" data-placement="bottom" title="Load&nbsp;JSON"><i class="fa fa-folder-open"></i></a></li>
-      <li><a href="#"  style="font-size: 21px" id="clear" class="svg" data-toggle="tooltip" data-placement="bottom" title="Clear&nbsp;canvas"><img src="img/clean.svg" style="width:21px; height:21px"/></a></li>
-  <li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li>
-      <li><a href="#" style="font-size: 21px" id="removeMany" data-toggle="tooltip" data-placement="bottom" title="Delete"><i class="fa fa-trash-o"></i></a></li>
-      <li><a href="#" style="font-size: 21px" id="group" data-toggle="tooltip" data-placement="bottom" title="Group"><i class="fa fa-object-group"></i></a></li>
-      <li><a href="#" style="font-size: 21px" id="ungroup" data-toggle="tooltip" data-placement="bottom" title="Ungroup"><i class="fa fa-object-ungroup"></i></a></li>
-      <li><a href="#" style="font-size: 21px" id="forward" data-toggle="tooltip" data-placement="bottom" title="Bring&nbsp;Forward"><i class="fa fa-level-up"></i></a></li>
-      <li><a href="#" style="font-size: 21px" id="back" data-toggle="tooltip" data-placement="bottom" title="Send&nbsp;Back"><i class="fa fa-level-down"></i></a></li>
-  <li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li><li>&nbsp;&nbsp;</li>
-      <li><a href="#" style="font-size: 21px" id="clone" class="svg" data-toggle="tooltip" data-placement="bottom" title="Duplicate"><img src="img/clone.svg" style="width:21px; height:21px"/></a></li>
-      <li><a href="#" style="font-size: 21px"  class="svg" data-placement="bottom" data-toggle="popover"><img src="img/square-shadow.svg" style="width:21px; height:21px"/></a></li>
-      <li><a href="#" style="font-size: 21px"  class="svg" data-placement="bottom" data-toggle="popover2"><img src="img/rotate.svg" style="width:21px; height:21px"/></a></li>
-      <li><a href="#" style="font-size: 21px" id="lock" data-placement="bottom" data-toggle="tooltip" title="Lock/Unlock"><i class="fa fa-lock"></i></a></li>
-      <li><a href="#" style="font-size: 21px" id="placement" data-placement="bottom" data-toggle="popover3"><i class="fa fa-arrows"></i></a></li>
+    <li class="dropdown-toggle">
+    <a href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-floppy-o"></i> File <span class="caret"></span></a>
+    <ul class="dropdown-menu">
+      <li><a href="#" style="font-size: 18px" id="save"><i class="fa fa-floppy-o"></i> <span class="small">Save image</span></a></li>
+      <li><a href="#" style="font-size: 18px" id="svg" class=""><img src="img/laptop-code.svg" style="width:18px; height:18px"/> <span class="small">Save JSON</span></a></li>
+      <li><a href="#" style="font-size: 18px" id="loadJson"><i class="fa fa-folder-open"></i> <span class="small">Load JSON</span></a></li>
+    </ul>
+    </li>
+  <li class="dropdown-toggle">
+    <a href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-wrench"></i> Tools <span class="caret"></span></a>
+  <ul class="dropdown-menu">
+      <li><a href="#" style="font-size: 18px" id="removeMany"><i class="fa fa-trash-o"></i> <span class="small">Delete</span></a></li>
+      <li><a href="#" style="font-size: 18px" id="clone"><img src="img/clone.svg" style="width:18px; height:18px"/> <span class="small">Duplicate</span></a></li>
+      <li><a href="#" style="font-size: 18px" id="lock"><i class="fa fa-lock"></i> <span class="small">Lock/Unlock</span></a></li>
+      <li><a href="#" style="font-size: 18px" id="group"><i class="fa fa-object-group"></i> <span class="small">Group</span></a></li>
+      <li><a href="#" style="font-size: 18px" id="ungroup"><i class="fa fa-object-ungroup"></i> <span class="small">Ungroup</span></a></li>
+      <li><a href="#" style="font-size: 18px" id="forward"><i class="fa fa-level-up"></i> <span class="small">Bring to front</span></a></li>
+      <li><a href="#" style="font-size: 18px" id="back"><i class="fa fa-level-down"></i> <span class="small">Send to back</span></a></li>
+  </ul>
+  </li>
+      <li><a href="#" style="font-size: 16px"  class="svg" data-placement="bottom" data-toggle="popover" role="button"><img src="img/square-shadow.svg" style="width:18px; height:18px"/> <span class="small" style="vertical-align:top">Shadow</span></a></li>
+      <li><a href="#" style="font-size: 16px"  class="svg" data-placement="bottom" data-toggle="popover2"><img src="img/rotate.svg" style="width:18px; height:18px"/>  <span class="small" style="vertical-align:top">Rotation</span></a></li>
+      <li><a href="#" style="font-size: 16px" id="placement" data-placement="bottom" data-toggle="popover3"><i class="fa fa-arrows"></i>   <span class="small" style="vertical-align:top">Set Same</span></a></li>
+      <li><a href="#"  style="font-size: 16px" id="clear" class="svg"><img src="img/clean.svg" style="width:18px; height:18px"/>  <span class="small" style="vertical-align:top">Clear</span></a></li>
     </ul>
 
       <ul class="nav navbar-nav navbar-right">
@@ -143,7 +151,7 @@ socket.on('resFiles', function(sql){
     </canvas>
 
   <div class="col-md-3" style="float:left;">
-    <h5>Shapes</h5>
+    <!-- <h5>Shapes</h5> -->
     <div class = "btn-group dropup">
          <button type = "button" class = "btn btn-default dropdown-toggle " data-toggle = "dropdown">
             <img src="img/shapes.svg" style="width: 23px; height:23px;" />
@@ -226,8 +234,8 @@ socket.on('resFiles', function(sql){
 </div>
   <div class="col-md-3" style="float:left, text-align: center;">
 
-    <div style="float:left">
-    <h5>Color Picker</h5>
+    <div style="float:left; vertical-align:bottom!important; line-height:10px">
+    <!-- <h5>Color Picker</h5> -->
       <label for="pickColor"><i class="glyphicon glyphicon-text-background" style="font-size:16px;vertical-align:middle"></i></label>
       <button id="pickColor"
           class="btn btn-default jscolor {valueElement:'selectColor',value:'333333',hash:true}"
@@ -250,7 +258,7 @@ socket.on('resFiles', function(sql){
   .btn-group.btn {   border: 0;   padding: 0; }
 </style>
   <div class="col-md-6.5" style="display:inline">
-    <h5>Text</h5>
+    <!-- <h5>Text</h5> -->
       <input type="text" class="form-control" id="label" placeholder="Insert text here" style="width:175px; float:left">
       <button class="btn btn-default" id="addText" disabled><img src="img/text.svg" style="width:19px; height:19px"/></button>
       <div class="btn-group">
@@ -434,6 +442,21 @@ socket.on('resFiles', function(sql){
 &nbsp;
 </div>
 </div>
+<div id="fillTypes" class="hide">
+<div class="btn-group center-block col-md-12">
+  <a href="#" class="btn btn-default" id="normalizeX">X</a>
+  <button class="btn btn-default" id="normalizeY">Y</button>
+  <button class="btn btn-default" id="normalizeW">W</button>
+  <button class="btn btn-default" id="normalizeH">H</button>
+</div>
+<div class="btn-group center-block col-md-12">
+  <button class="btn btn-default" id="serializeX"><i class="glyphicon glyphicon-option-horizontal"></i></button>
+  <button class="btn btn-default" id="serializeY"><i class="glyphicon glyphicon-option-vertical"></i></button>
+</div>
+<div class="form-group" style="width:190px!important; text-align:center; vertical-align:middle; font-size:10px; max-height:20px!important; height:auto">
+&nbsp;
+</div>
+</div>
 
 <nav id="context-menu" style="display:none; z-index:999; position:absolute; background: #CCC; opacity: 0.9; padding:0; margin:0">
   <ul class="context-menu__items" style="text-decoration: none; list-style-type: none;padding:5px; margin:0">
@@ -492,23 +515,37 @@ function identify(name, socket){
 }
 
 $(document).ready(function(){
-  $('[data-toggle="popover"]').popover({content: function () {
-                                        return $('#shadowOptions').html();
-                                        },
-                                        html: true,
+  $('[data-toggle="popover"]').popover({
+    content: function (){
+                          return $('#shadowOptions').html();
+                        },
+                        html: true,
                                       });
-  $('[data-toggle="popover2"]').popover({content: function () {
-                                        return $('#rotation').html();
-                                        },
-                                        html: true,
+  $('[data-toggle="popover2"]').popover({
+    content: function (){
+                          return $('#rotation').html();
+                        },
+                        html: true,
                                       });
-$('[data-toggle="popover3"]').popover({content: function () {
-                                      return $('#placementOptions').html();
-                                      },
-                                      html: true,
+$('[data-toggle="popover3"]').popover({
+  content: function (){
+                      return $('#placementOptions').html();
+                      },
+                      html: true,
+                                    });
+$('[data-toggle="popover3"]').popover({
+  content: function (){
+                      return $('#fillTypes').html();
+                      },
+                      html: true,
                                     });
   if(!electron){
-    $("#changelog").load('log/changelog.html')
+    $("#changelog").load('log/changelog.html');
+    setTimeout(function(){
+      $("#cversion").text($("#version").text());
+    },250)
+    
+    
   }
   if(electron){
     $("#accordion").hide();
@@ -519,8 +556,8 @@ $('[data-toggle="popover3"]').popover({content: function () {
         var imgURL = $img.attr('src');
         jQuery.get(imgURL, function(data) {
             var $svg = jQuery(data).find('svg');
-            $svg.attr('width', 21)
-            $svg.attr('height', 21)
+            $svg.attr('width', 18)
+            $svg.attr('height', 18)
             $svg.attr('fill', '#777')
             $svg.attr('class', 'svg')
             // Replace image with new SVG

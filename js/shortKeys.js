@@ -1,5 +1,5 @@
 function handleContextMenu(e){
-  e.preventDefault();
+  //e.preventDefault();
   // get mouse position relative to the canvas
   var x=parseInt(e.pageX);
   var y=parseInt(e.pageY);
