@@ -16,6 +16,7 @@ if(electron===true){
 <script type="text/javascript" src="js/FileSaver.min.js"></script>
 <link rel="stylesheet" href="css/range.css">
 <link rel="stylesheet" href="css/contextMenu.css">
+<link rel="stylesheet" href="css/styles.css">
 <!--<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.9/fabric.min.js"></script>-->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js" crossorigin="anonymous"></script><!--socketIO-->
@@ -104,12 +105,18 @@ socket.on('resFiles', function(sql){
 </head>
 <body>
 <div id="content">
-<nav class="navbar navbar-default" style="padding:0;margin-bottom:5px; height:15px!important; max-height:15px!important;">
+<nav class="navbar navbar-default" style="border-radius:0;padding:0;margin-bottom:3px; height:15px!important; max-height:15px!important;z-index:9999">
   <div class="container-fluid">
     <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#menuNavBar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
       <span class="navbar-brand" href="#">Whiteboard <small style="font-size:12px" id="cversion"></small></span>
     </div>
-     <ul class="nav navbar-nav">
+  <div class="collapse navbar-collapse" id="menuNavBar">
+  <ul class="nav navbar-nav">
     <li class="dropdown-toggle">
     <a href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-floppy-o"></i> File <span class="caret"></span></a>
     <ul class="dropdown-menu">
@@ -130,27 +137,64 @@ socket.on('resFiles', function(sql){
       <li><a href="#" style="font-size: 18px" id="back"><i class="fa fa-level-down"></i> <span class="small">Send to back</span></a></li>
   </ul>
   </li>
-      <li><a href="#" style="font-size: 16px"  class="svg" data-placement="bottom" data-toggle="popover" role="button"><img src="img/square-shadow.svg" style="width:18px; height:18px"/> <span class="small" style="vertical-align:top">Shadow</span></a></li>
-      <li><a href="#" style="font-size: 16px"  class="svg" data-placement="bottom" data-toggle="popover2"><img src="img/rotate.svg" style="width:18px; height:18px"/>  <span class="small" style="vertical-align:top">Rotation</span></a></li>
-      <li><a href="#" style="font-size: 16px" id="placement" data-placement="bottom" data-toggle="popover3"><i class="fa fa-arrows"></i>   <span class="small" style="vertical-align:top">Set Same</span></a></li>
-      <li><a href="#"  style="font-size: 16px" id="clear" class="svg"><img src="img/clean.svg" style="width:18px; height:18px"/>  <span class="small" style="vertical-align:top">Clear</span></a></li>
-    </ul>
-
-      <ul class="nav navbar-nav navbar-right">
-        <li><a href="#" style="font-size: 21px" id="help" data-toggle="tooltip" data-placement="bottom" title="Help"><i class="fa fa-question"></i></a></li>
-    </ul>
+      <li><a href="#" style="font-size: 16px"  class="svg" data-placement="bottom" data-toggle="collapse" data-target="#shadowOptions"><img src="img/square-shadow.svg" style="width:18px; height:18px"/> <span class="small" style="vertical-align:top">Shadow</span></a>
+<div id="shadowOptions"  class="collapse" style="position: absolute !important;">
+  <div class="btn-group" style="width:101%">
+    <button id="shadow" class="btn btn-default" style="width:50%">
+      <img src="img/square-shadow.svg" style="width:11px; height:14px"/> <span class="small">
+    </button>
+    <button id="removeShadow" class="btn btn-default" style="width:50%"><i class="fa fa-times"></i> </button>
   </div>
+<div class="input-group">
+  <label for="blur" class="input-group-addon" style="width:100%">Blur </label><input type="text" id="blur" value="5" class="form-control" style="width:45px">
+</div>
+<div class="input-group">
+  <label for="offsetx" class="input-group-addon">Offset X </label><input type="text" id="offsetx" value="5" class="form-control" style="width:45px">
+</div>
+<div class="input-group">
+  <label for="offsety" class="input-group-addon">Offset Y </label><input type="text" id="offsety" value="7" class="form-control" style="width:45px">
+  </div>
+</div>
+      </li>
+      <li><a href="#" style="font-size: 16px"  class="svg" data-placement="bottom" data-toggle="collapse" data-target="#rotation"><img src="img/rotate.svg" style="width:18px; height:18px"/>  <span class="small" style="vertical-align:top">Rotation</span></a>
+        <div id="rotation" class="collapse" style="position: absolute !important;">
+          <div class="btn-group-vertical center-block col-md-12">
+            <button id="clockwise" class="btn btn-default"><img src="img/rotate-45.svg" style="width:12px; height:14px" id="cw"/> 45 degrees</button>
+            <button id="counterClockwise" class="btn btn-default"><img src="img/rotate45.svg" style="width:12px; height:14px" id="ccw"/> 45 degrees</button>
+            <button id="flipX" class="btn btn-default"><img src="img/repeat.svg" style="width:12px; height:14px;" id="fx"/> Flip X axis</button>
+            <button id="flipY" class="btn btn-default"><img src="img/repeat.svg" style="width:12px; height:14px; transform: rotate(90deg)" id="fy"/> Flip Y axis</button>
+          </div>
+        </div>
+      </li>
+      <li>
+      <a href="#" style="font-size: 16px" id="placement" data-placement="right" data-toggle="collapse" data-target="#placementOptions"><i class="fa fa-arrows"></i>   <span class="small" style="vertical-align:top">Set Same</span></a>
+        <div id="placementOptions" class="collapse" style="position: absolute !important;">
+          <div class="btn-group-vertical center-block col-md-12 ">
+            <a href="#" class="btn btn-default" id="normalizeX">X Axis</a>
+            <button class="btn btn-default" id="normalizeY">Y Axis</button>
+            <button class="btn btn-default" id="normalizeW">Width</button>
+            <button class="btn btn-default" id="normalizeH">Height</button>
+            <button class="btn btn-default" id="serializeX"><i class="glyphicon glyphicon-option-horizontal"></i> Horizontal</button>
+            <button class="btn btn-default" id="serializeY"><i class="glyphicon glyphicon-option-vertical"></i> Vertical</button>
+          </div>
+      </li>
+      <li><a href="#"  style="font-size: 16px" id="clear" class="svg"><img src="img/clean.svg" style="width:18px; height:18px"/>  <span class="small" style="vertical-align:top">Clear</span></a></li>
+  </ul>
+
+<!--       <ul class="nav navbar-nav navbar-right">
+        <li><a href="#" style="font-size: 21px" id="help" data-toggle="tooltip" data-placement="bottom" title="Help"><i class="fa fa-question"></i></a></li>
+    </ul> -->
+  </div>
+  </div>
+
+</div>
 </nav>
 <div style="float:left;z-index:998" id="viewport">
 
-    <canvas id="myCanvas" width="1355" height="520" style="border:1px dotted black; margin-left:5px;">
-      <p>This is fallback content
-      for users of assistive technologies
-      or of browsers that don't have
-      full support for the Canvas API.</p>
+    <canvas id="myCanvas" width="1355" height="565" style="border:1px dotted black; margin-left:5px;">
+      <p>Your browser does not support html5 canvas</p>
     </canvas>
-
-  <div class="col-md-3" style="float:left;">
+  <div class="col-md-3 btn-group" style="float:left;">
     <!-- <h5>Shapes</h5> -->
     <div class = "btn-group dropup">
          <button type = "button" class = "btn btn-default dropdown-toggle " data-toggle = "dropdown">
@@ -219,7 +263,7 @@ socket.on('resFiles', function(sql){
               <button class="btn btn-default" style="font-size: 21px" id="draw"><i class="glyphicon glyphicon-pencil"></i></button>
               <button class="btn btn-default" style="font-size: 21px" id="paint"><i class="fa fa-paint-brush"></i></button>
               <button class="btn btn-default" id="drawArrow"><img style="width: 21px; height:21px; padding:0; margin:0" src="img/swirly-arrow.svg"/></button>
-              <button class="btn btn-default" id="drawArrowStraight"><img style="width: 21px; height:21px; padding:0; margin:0" src="img/up-arrow.svg"/></button>
+              <button class="btn btn-default" id="drawArrowStraight"><img style="width: 21px; height:21px; padding:0; margin:0; transform: rotate(90deg)" src="img/up-arrow.svg"/></button>
               <button class="btn btn-default" id="drawQuad"><img style="width: 21px; height:21px; padding:0; margin:0" src="img/semicircular-up-arrow.svg"/></button>
             </li>
               <li class="btn-group">
@@ -234,7 +278,7 @@ socket.on('resFiles', function(sql){
 </div>
   <div class="col-md-3" style="float:left, text-align: center;">
 
-    <div style="float:left; vertical-align:bottom!important; line-height:10px">
+    <div style="float:left; vertical-align:bottom!important; line-height:40px">
     <!-- <h5>Color Picker</h5> -->
       <label for="pickColor"><i class="glyphicon glyphicon-text-background" style="font-size:16px;vertical-align:middle"></i></label>
       <button id="pickColor"
@@ -248,10 +292,17 @@ socket.on('resFiles', function(sql){
       <input id="selectColor" value="FFFFFF" style="display:none">
       </div>
       <div class="col-md-6" style="margin-top: 4px">
-      <button class="btn btn-default" id="fill" class="svg2"><img src="img/fill.svg" style="width: 21px; height:21px;" /></button>
-      <button class="btn btn-default" id="outline"><img src="img/border.svg" style="width: 21px; height:21px;" /></button>
-      <button class="btn btn-default" id="removeFill"><img src="img/clear_background.svg" style="width: 21px; height:21px;" /></button>
-      <button class="btn btn-default" id="removeOutline"><img src="img/clear_outline.svg" style="width: 21px; height:21px;" /></button>
+        <button class="btn btn-default" class="svg2" data-toggle="collapse" data-target="#fillTypes"><img src="img/fill.svg" style="width: 21px; height:21px;" /></button>
+        <div id="fillTypes" class="collapse" style="position: absolute;bottom:40px">
+          <div class="btn-group">
+          <button class="btn btn-default" id="fill" class="svg2"><img src="img/fill.svg" style="width: 21px; height:21px;" /></button>
+          <button class="btn btn-default" id="outline"><img src="img/border.svg" style="width: 21px; height:21px;" /></button>
+          </div>
+          <div class="btn-group">
+          <button class="btn btn-default" id="removeFill"><img src="img/clear_background.svg" style="width: 21px; height:21px;"/></button>
+          <button class="btn btn-default" id="removeOutline"><img src="img/clear_outline.svg" style="width: 21px; height:21px;"/></button>
+          </div>
+      </div>
       </div>
   </div>
 <style type="text/css">
@@ -292,30 +343,6 @@ socket.on('resFiles', function(sql){
         </div>
   </div>
   <div class="clearfix"></div>
-
-<div id="helpPage" class="carousel slide" data-ride="carousel" data-interval="false" style="display: none; width:1300px;height:540px; z-index:9999; margin:0 auto; text-align:center!important">
-  <!-- Indicators -->
-  <!-- Wrapper for slides -->
-  <div class="carousel-inner" style="">
-    <div class="item active">
-      <img src="help/shapes.png" alt="Los Angeles" class="center-block" style="height:508px">
-    </div>
-
-    <div class="item">
-      <img src="help/buttons.png" alt="Chicago" class="center-block" style="height:508px">
-    </div>
-  </div>
-  <!-- Left and right controls -->
-  <a class="left carousel-control" href="#helpPage" data-slide="prev">
-    <span class="glyphicon glyphicon-chevron-left"></span>
-    <span class="sr-only">Previous</span>
-  </a>
-  <a class="right carousel-control" href="#helpPage" data-slide="next">
-    <span class="glyphicon glyphicon-chevron-right"></span>
-    <span class="sr-only">Next</span>
-  </a>
-<button class="btn btn-default" id="closeHelp">Close Help</button>
-</div>
 
 <div class="panel-group" id="accordion" style="position: fixed; bottom:0;left:0; width:100%;padding:0; margin:0">
     <div class="panel panel-default">
@@ -402,64 +429,9 @@ socket.on('resFiles', function(sql){
         </div>
       </div>
 <!-- Save PNG/SVG modal -->
-<div id="shadowOptions"  class="hide">
-  <div class="btn-group center-block col-md-11">
-    <button id="shadow" class="btn btn-default">
-      <img src="img/square-shadow.svg" style="width:11px; height:14px"/>
-    </button>
-    <button id="removeShadow" class="btn btn-default"><i class="fa fa-times"></i></button>
-  </div>
-<div class="form-group" style="width:120px!important; text-align:left; vertical-align:middle; font-size:10px">
 
-  <label for="blur" class="col-md-5" style="line-height:2.5">Blur </label><input type="text" id="blur" value="5" class="form-control" style="width:45px">
-  <label for="offsetx" class="col-md-5">Offset X </label><input type="text" id="offsetx" value="5" class="form-control" style="width:45px">
-  <label for="offsety" class="col-md-5">Offset Y </label><input type="text" id="offsety" value="7" class="form-control" style="width:45px">
-</div>
-</div>
-<div id="rotation" class="hide">
-<div class="btn-group center-block col-md-12">
-  <button id="clockwise" class="btn btn-default"><img src="img/rotate-45.svg" style="width:12px; height:14px" id="cw"/></button>
-  <button id="counterClockwise" class="btn btn-default"><img src="img/rotate45.svg" style="width:12px; height:14px" id="ccw"/></button>
-  <button id="flipX" class="btn btn-default"><img src="img/repeat.svg" style="width:12px; height:14px;" id="fx"/></button>
-  <button id="flipY" class="btn btn-default"><img src="img/repeat.svg" style="width:12px; height:14px; transform: rotate(90deg)" id="fy"/></button>
-</div>
-<div class="form-group" style="width:190px!important; text-align:center; vertical-align:middle; font-size:10px; max-height:20px!important; height:auto">
-&nbsp;
-</div>
-</div>
-<div id="placementOptions" class="hide">
-<div class="btn-group center-block col-md-12">
-  <a href="#" class="btn btn-default" id="normalizeX">X</a>
-  <button class="btn btn-default" id="normalizeY">Y</button>
-  <button class="btn btn-default" id="normalizeW">W</button>
-  <button class="btn btn-default" id="normalizeH">H</button>
-</div>
-<div class="btn-group center-block col-md-12">
-  <button class="btn btn-default" id="serializeX"><i class="glyphicon glyphicon-option-horizontal"></i></button>
-  <button class="btn btn-default" id="serializeY"><i class="glyphicon glyphicon-option-vertical"></i></button>
-</div>
-<div class="form-group" style="width:190px!important; text-align:center; vertical-align:middle; font-size:10px; max-height:20px!important; height:auto">
-&nbsp;
-</div>
-</div>
-<div id="fillTypes" class="hide">
-<div class="btn-group center-block col-md-12">
-  <a href="#" class="btn btn-default" id="normalizeX">X</a>
-  <button class="btn btn-default" id="normalizeY">Y</button>
-  <button class="btn btn-default" id="normalizeW">W</button>
-  <button class="btn btn-default" id="normalizeH">H</button>
-</div>
-<div class="btn-group center-block col-md-12">
-  <button class="btn btn-default" id="serializeX"><i class="glyphicon glyphicon-option-horizontal"></i></button>
-  <button class="btn btn-default" id="serializeY"><i class="glyphicon glyphicon-option-vertical"></i></button>
-</div>
-<div class="form-group" style="width:190px!important; text-align:center; vertical-align:middle; font-size:10px; max-height:20px!important; height:auto">
-&nbsp;
-</div>
-</div>
-
-<nav id="context-menu" style="display:none; z-index:999; position:absolute; background: #CCC; opacity: 0.9; padding:0; margin:0">
-  <ul class="context-menu__items" style="text-decoration: none; list-style-type: none;padding:5px; margin:0">
+<nav id="context-menu">
+  <ul class="context-menu__items">
     <li class="context-menu__item">
       <a href="#" class="context-menu__link" id="menu_lock">
         <i class="fa fa-lock"></i> Lock
@@ -475,16 +447,16 @@ socket.on('resFiles', function(sql){
         <i class="fa fa-times"></i> Delete
       </a>
     </li>
-    <li class="context-menu__item">
-      <a href="#" class="context-menu__link" id="menu_set">
+    <li class="dropdown">
+      <a href="#" class="dropdown-toggle context-menu__link" id="menu_set" data-toggle="dropdown">
         <i class="fa fa-arrows"></i> Set Same <span class="caret"></span>
       </a>
-      <ul id="setsame" style="display:none">
+      <ul id="setsame" class="dropdown-menu">
         <li><a href="#" class="context-menu__link" id="setX">Left</a></li>
         <li><a href="#" class="context-menu__link" id="setY">Top</a></li>
         <li><a href="#" class="context-menu__link" id="setW">Width</a></li>
         <li><a href="#" class="context-menu__link" id="setH">Height</a></li>
-      <ul>
+      </ul>
     </li>
   </ul>
 </nav>
@@ -515,37 +487,11 @@ function identify(name, socket){
 }
 
 $(document).ready(function(){
-  $('[data-toggle="popover"]').popover({
-    content: function (){
-                          return $('#shadowOptions').html();
-                        },
-                        html: true,
-                                      });
-  $('[data-toggle="popover2"]').popover({
-    content: function (){
-                          return $('#rotation').html();
-                        },
-                        html: true,
-                                      });
-$('[data-toggle="popover3"]').popover({
-  content: function (){
-                      return $('#placementOptions').html();
-                      },
-                      html: true,
-                                    });
-$('[data-toggle="popover3"]').popover({
-  content: function (){
-                      return $('#fillTypes').html();
-                      },
-                      html: true,
-                                    });
   if(!electron){
     $("#changelog").load('log/changelog.html');
     setTimeout(function(){
       $("#cversion").text($("#version").text());
     },250)
-    
-    
   }
   if(electron){
     $("#accordion").hide();

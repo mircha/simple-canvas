@@ -2,3 +2,30 @@
   position: relative;
   z-index: 9999!important;
 }
+.context-menu__link{
+	color: #777;
+}
+.context-menu__link:hover {
+	color: black;
+	text-decoration: none
+}
+#context-menu{
+	display:none; 
+	z-index:999; 
+	position:absolute; 
+	background: white; 
+	opacity: 0.9; 
+	padding:5px; 
+	margin:0;
+	border: 1px solid #CCC;
+	min-width: 150px
+}
+.context-menu__items{
+	text-decoration: none; 
+	list-style-type: none;
+	padding:5px; 
+	margin:0; 
+}
+.context-menu__item:hover{
+	background: rgba(0,0,0,0.05);
+}
