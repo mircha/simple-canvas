@@ -96,6 +96,6 @@ app.use('/help', express.static(path.join(__dirname, 'help')))
 app.use('/json', express.static(path.join(__dirname, 'json')))
 app.use('/log', express.static(path.join(__dirname, 'log')))
 
-http.listen(3000, function(){
+http.listen(80, function(){
 	console.log('listening on port 3000!')
 });
